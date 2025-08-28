@@ -61,6 +61,6 @@ private struct PlanetsPlaceholderView: View {
     AppMainView()
 }
 
-#Preview("iPhone") {
+#Preview("iPad") {
     AppMainView()
 }

@@ -1,0 +1,82 @@
+# Created by https://www.toptal.com/developers/gitignore/api/swift,xcode
+# Edit at https://www.toptal.com/developers/gitignore?templates=swift,xcode
+
+### Xcode ###
+# Xcode
+#
+# gitignore contributors: remember to update Xcode.gitignore, Swift.gitignore,
+# and Objective-C.gitignore simultaneously
+build/
+DerivedData/
+
+## Build generated
+*.o
+*.out
+*.a
+*.hmap
+*.ipa
+*.dSYM/
+*.mobileprovision
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/project.xcworkspace/
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcworkspace/xcshareddata/
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## Other
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+*.xcscheme
+
+# Swift Package Manager
+#
+# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
+# *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+# Package.resolved
+.build/
+Packages/
+SourcePackages/
+
+# Carthage
+Carthage/Build
+Carthage/Checkouts
+
+# CocoaPods
+Pods/
+!Podfile
+!Podfile.lock
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://docs.fastlane.tools/best-practices/source-control/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Codecov
+*.profraw
+
+### Swift ###
+# Swift Package Manager
+.build/
+Packages/
+
+# End of https://www.toptal.com/developers/gitignore/api/swift,xcode

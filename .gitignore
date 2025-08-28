@@ -1,19 +1,28 @@
-# macOS
+# macOS cruft
 .DS_Store
+**/.DS_Store
 *.swp
 
-# Xcode
+# Xcode build output
 build/
 DerivedData/
 
-# User-specific Xcode files - IGNORE THESE
-*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+# Xcode user-specific files
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
-*.xcuserstate
-*.xcworkspace/contents.xcworkspacedata
+**/*.xcuserstate
+**/*.xcscmblueprint
+
+# Xcode workspace noise (keep shared schemes if you use them)
+# *.xcodeproj/project.xcworkspace/ is OK to keep; ignore only user data above.
 
 # Swift Package Manager
 .build/
 Packages/
 SourcePackages/
+.swiftpm/
+# Package.resolved: 
+# - For apps, ignoring is fine (Xcode regenerates).
+# - For libraries, many teams commit it to pin deps.
+# Uncomment to ignore:
+# **/Package.resolved

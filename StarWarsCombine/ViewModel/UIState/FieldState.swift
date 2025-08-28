@@ -1,7 +1,11 @@
-//
-//  Untitled.swift
-//  StarWarsCombine
-//
-//  Created by Juan Francisco Marcenaro Arellano on 28/08/25.
-//
+// File: /ViewModel/UIState/FieldState.swift
 
+import Foundation
+
+/// Per-input UI state that the View binds to (colors/messages).
+public enum FieldState: Equatable {
+    case idle
+    case typing
+    case valid
+    case invalid(message: String)
+}

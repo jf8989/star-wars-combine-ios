@@ -3,25 +3,30 @@
 import Combine
 import Foundation
 
-/// Service abstraction for fetching SWAPI planets.
-public protocol PlanetsService {
-    /// Fetch first page of planets.
-    func fetchFirstPage() -> AnyPublisher<PlanetsPageDTO, Error>
-    /// Fetch next page using absolute URL from previous response.
-    func fetchPage(at url: URL) -> AnyPublisher<PlanetsPageDTO, Error>
-}
-
-/// Lightweight DTOs to keep Phase 0 compiling; real mapping lands in Phase 2.
-public struct PlanetsPageDTO: Decodable {
+// MARK: - Domain response returned by the service
+public struct PlanetsPage {
     public let next: URL?
-    public let results: [PlanetDTO]
+    public let planets: [Planet]
 }
 
-public struct PlanetDTO: Decodable {
-    public let name: String
-    public let climate: String
-    public let gravity: String
-    public let terrain: String
-    public let diameter: String
-    public let population: String
+// MARK: - Service Protocol
+public protocol PlanetsService {
+    func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError>
+    func fetchPage(at url: URL) -> AnyPublisher<PlanetsPage, AppError>
+    func searchPlanets(query: String) -> AnyPublisher<PlanetsPage, AppError>
+}
+
+// MARK: - Network DTOs (internal)
+struct PlanetsPageDTO: Decodable {
+    let next: String?  // SWAPI returns URL as String; convert to URL later
+    let results: [PlanetDTO]
+}
+
+struct PlanetDTO: Decodable {
+    let name: String
+    let climate: String
+    let gravity: String
+    let terrain: String
+    let diameter: String
+    let population: String
 }

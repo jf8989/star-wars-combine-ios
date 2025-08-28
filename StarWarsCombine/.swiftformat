@@ -1,0 +1,11 @@
+# File: /.swiftformat
+
+--indent 4
+--maxwidth 120
+--self insert
+--hexgrouping 4,8
+--ifdef no-indent
+--stripunusedargs closure-only
+--keepunusedarguments label
+--wraparguments before-first
+--wrapcollections before-first

@@ -1,9 +1,4 @@
-//
-//  StarWarsCombineApp.swift
-//  StarWarsCombine
-//
-//  Created by Juan Francisco Marcenaro Arellano on 28/08/25.
-//
+// File: /App/StarWarsCombineApp.swift
 
 import SwiftUI
 
@@ -11,7 +6,7 @@ import SwiftUI
 struct StarWarsCombineApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppMainView()
         }
     }
 }

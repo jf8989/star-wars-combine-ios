@@ -3,26 +3,21 @@
 **/.DS_Store
 *.swp
 
-# Xcode build output
+# Xcode build products
 build/
 DerivedData/
 
-# Xcode user-specific files
+# User-specific settings
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
-**/*.xcuserstate
-**/*.xcscmblueprint
-
-# Xcode workspace noise (keep shared schemes if you use them)
-# *.xcodeproj/project.xcworkspace/ is OK to keep; ignore only user data above.
+*.xcuserstate
+*.xcscmblueprint
 
 # Swift Package Manager
 .build/
 Packages/
 SourcePackages/
 .swiftpm/
-# Package.resolved: 
-# - For apps, ignoring is fine (Xcode regenerates).
-# - For libraries, many teams commit it to pin deps.
-# Uncomment to ignore:
+
+# Optional: ignore Package.resolved if you don’t care about locking deps across machines
 # **/Package.resolved

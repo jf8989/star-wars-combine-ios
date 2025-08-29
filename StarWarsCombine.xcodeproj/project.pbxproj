@@ -11,9 +11,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		74AC70A32E60C5A100741F69 /* StarWarsCombine */ = {
+		74AC70A32E60C5A100741F69 /* App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = StarWarsCombine;
+			path = App;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		74AC70982E60C5A100741F69 = {
 			isa = PBXGroup;
 			children = (
-				74AC70A32E60C5A100741F69 /* StarWarsCombine */,
+				74AC70A32E60C5A100741F69 /* App */,
 				74AC70A22E60C5A100741F69 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +61,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				74AC70A32E60C5A100741F69 /* StarWarsCombine */,
+				74AC70A32E60C5A100741F69 /* App */,
 			);
 			name = StarWarsCombine;
 			packageProductDependencies = (

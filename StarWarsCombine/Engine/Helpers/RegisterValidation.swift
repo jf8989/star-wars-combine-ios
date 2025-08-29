@@ -28,7 +28,7 @@ public enum RegisterValidation {
     public static func validateAge(_ raw: String) -> Bool {
         guard let age = Int(raw.trimmingCharacters(in: .whitespacesAndNewlines))
         else { return false }
-        return (18...120).contains(age)
+        return (19...100).contains(age)  // older than 18
     }
 
     /// Exactly 8 digits (no spaces, no symbols).
@@ -56,7 +56,7 @@ public enum RegisterValidation {
 
     /// Document number:
     /// - id: exactly 8 digits
-    /// - passport: 6–9 alphanumerics (letters or digits)
+    /// - passport: Exactly 9 chars, first must be a letter, remaining are letters or digits
     public static func validateDocNumber(_ raw: String, for type: DocumentType)
         -> Bool
     {
@@ -65,8 +65,9 @@ public enum RegisterValidation {
         case .id:
             return s.count == 8 && s.allSatisfy(\.isNumber)
         case .passport:
-            guard (6...9).contains(s.count) else { return false }
-            return s.unicodeScalars.allSatisfy {
+            guard s.count == 9 else { return false }
+            guard let first = s.first, first.isLetter else { return false }
+            return s.dropFirst().unicodeScalars.allSatisfy {
                 CharacterSet.alphanumerics.contains($0)
             }
         }

@@ -136,7 +136,7 @@ public final class RegisterViewModel: ObservableObject {
         switch type {
         case .id: return .invalid(message: "ID must be exactly 8 digits.")
         case .passport:
-            return .invalid(message: "Passport: 6–9 letters/digits.")
+            return .invalid(message: "Passport must be 9 characters long, first must be a letter, remaining are letters or digits")
         }
     }
 }

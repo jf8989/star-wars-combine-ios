@@ -1,4 +1,4 @@
-// File: /ViewModel/PlanetsViewModel.swift
+// ViewModel/PlanetsViewModel.swift
 
 import Combine
 import Foundation

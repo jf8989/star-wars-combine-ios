@@ -1,3 +1,5 @@
+// View/Components/DocumentSection.swift
+
 import SwiftUI
 import UIKit
 

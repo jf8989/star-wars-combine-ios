@@ -1,4 +1,4 @@
-// File: /ViewModel/RegisterViewModel.swift
+// ViewModel/RegisterViewModel.swift
 
 import Combine
 import Foundation

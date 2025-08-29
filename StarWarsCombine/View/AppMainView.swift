@@ -1,5 +1,4 @@
-// File: /View/AppMainView.swift
-// PATCH: replace the Phase-0 placeholder screens with real views + VM injection.
+// View/AppMainView.swift
 
 import SwiftUI
 

@@ -1,4 +1,4 @@
-// File: /ViewModel/UIState/FieldState.swift
+// ViewModel/UIState/FieldState.swift
 
 import Foundation
 

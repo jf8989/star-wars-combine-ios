@@ -1,4 +1,4 @@
-// File: /App/StarWarsCombineApp.swift
+// App/StarWarsCombineApp.swift
 
 import SwiftUI
 

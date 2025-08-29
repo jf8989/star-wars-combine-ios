@@ -1,4 +1,4 @@
-// File: /Shared/Route.swift
+// Shared/Route.swift
 
 import Foundation
 

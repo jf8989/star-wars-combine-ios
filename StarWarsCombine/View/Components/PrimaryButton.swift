@@ -1,3 +1,5 @@
+// View/Components/PrimaryButton.swift
+
 import SwiftUI
 
 /// Reusable primary button used by RegisterView.

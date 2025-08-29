@@ -1,4 +1,4 @@
-// File: /Model/RegisterValidation.swift
+// Model/RegisterValidation.swift
 
 import Foundation
 

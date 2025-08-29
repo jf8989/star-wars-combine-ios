@@ -1,4 +1,4 @@
-// File: /Shared/TaskBag.swift
+// Shared/TaskBag.swift
 
 import Combine
 import Foundation

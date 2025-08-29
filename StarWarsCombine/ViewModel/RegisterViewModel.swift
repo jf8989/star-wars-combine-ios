@@ -109,7 +109,7 @@ public final class RegisterViewModel: ObservableObject {
         let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !s.isEmpty else { return .idle }
         return RegisterValidation.validateAge(s)
-            ? .valid : .invalid(message: "Age must be 18–120.")
+            ? .valid : .invalid(message: "Age must be 18 or older.")
     }
 
     private static func stateForPhone(_ raw: String) -> FieldState {

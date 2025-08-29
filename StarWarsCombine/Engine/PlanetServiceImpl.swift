@@ -92,10 +92,7 @@ public final class PlanetsServiceImpl: PlanetsService {
                     return PlanetsPage(next: nil, planets: [p])
                 }
 
-                // 4) If none matched, throw a descriptive error including a snippet
-                let snippet =
-                    String(data: data, encoding: .utf8)?.prefix(200)
-                    ?? "non-utf8"
+                /// 4) If none matched, throw a descriptive error
                 struct UnexpectedPayload: Error {}
                 throw UnexpectedPayload()
             }

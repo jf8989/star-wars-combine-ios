@@ -1,4 +1,4 @@
-// View/AppMainView.swift
+// App/Main/AppMainView.swift
 
 import SwiftUI
 

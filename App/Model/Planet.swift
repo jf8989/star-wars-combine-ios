@@ -1,4 +1,4 @@
-// Model/Planet.swift
+// App/Model/Planet.swift
 
 import Foundation
 

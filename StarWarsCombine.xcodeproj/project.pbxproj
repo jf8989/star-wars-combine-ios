@@ -7,13 +7,23 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		74AC70A12E60C5A100741F69 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsCombine.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		74AC70A12E60C5A100741F69 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = StarWarsCombine.app; path = "/Users/jfma89/Documents/00 Development/StarWarsCombine/build/Debug-iphoneos/StarWarsCombine.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		74AC70A32E60C5A100741F69 /* App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = App;
+			sourceTree = "<group>";
+		};
+		74C297012E626A5500E5F8D9 /* Planets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Planets;
+			sourceTree = "<group>";
+		};
+		74C297032E626A6200E5F8D9 /* Registration */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Registration;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +43,9 @@
 			isa = PBXGroup;
 			children = (
 				74AC70A32E60C5A100741F69 /* App */,
-				74AC70A22E60C5A100741F69 /* Products */,
+				74C297032E626A6200E5F8D9 /* Registration */,
+				74C297012E626A5500E5F8D9 /* Planets */,
 			);
-			sourceTree = "<group>";
-		};
-		74AC70A22E60C5A100741F69 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				74AC70A12E60C5A100741F69 /* StarWarsCombine.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -62,6 +65,8 @@
 			);
 			fileSystemSynchronizedGroups = (
 				74AC70A32E60C5A100741F69 /* App */,
+				74C297012E626A5500E5F8D9 /* Planets */,
+				74C297032E626A6200E5F8D9 /* Registration */,
 			);
 			name = StarWarsCombine;
 			packageProductDependencies = (
@@ -95,7 +100,7 @@
 			mainGroup = 74AC70982E60C5A100741F69;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 74AC70A22E60C5A100741F69 /* Products */;
+			productRefGroup = 74AC70982E60C5A100741F69;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

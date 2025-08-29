@@ -1,4 +1,4 @@
-// View/Components/PrimaryButton.swift
+// App/Registration/Components/PrimaryButton.swift
 
 import SwiftUI
 

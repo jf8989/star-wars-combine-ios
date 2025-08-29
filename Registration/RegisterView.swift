@@ -1,4 +1,4 @@
-// View/RegisterView.swift
+// App/Registration/RegisterView.swift
 
 import SwiftUI
 

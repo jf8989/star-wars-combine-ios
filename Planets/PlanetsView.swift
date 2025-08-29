@@ -1,4 +1,4 @@
-// View/PlanetsView.swift
+// App/Planets/PlanetsView.swift
 
 import SwiftUI
 

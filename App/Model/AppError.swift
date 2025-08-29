@@ -1,4 +1,4 @@
-// Model/AppError.swift
+// App/Model/AppError.swift
 
 import Foundation
 

@@ -1,4 +1,4 @@
-// View/Components/DocumentSection.swift
+// App/Registration/Components/DocumentSection.swift
 
 import SwiftUI
 import UIKit

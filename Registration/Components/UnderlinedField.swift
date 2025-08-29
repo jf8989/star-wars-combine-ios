@@ -1,4 +1,4 @@
-// View/Components/UnderlinedField.swift
+// App/Registration/Components/UnderlinedField.swift
 
 import SwiftUI
 import UIKit

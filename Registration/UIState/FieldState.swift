@@ -1,4 +1,4 @@
-// ViewModel/UIState/FieldState.swift
+// App/Registration/UIState/FieldState.swift
 
 import Foundation
 

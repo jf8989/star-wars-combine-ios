@@ -40,6 +40,8 @@ struct UnderlinedField: View {
                 .keyboardType(keyboard)
                 .autocorrectionDisabled()
                 .focused($isFocused)
+                // Force a fresh UITextField when keyboard type changes
+                .id(keyboard.rawValue)
                 .padding(.vertical, 8)
                 .overlay(alignment: .bottom) {
                     Rectangle()
@@ -53,6 +55,13 @@ struct UnderlinedField: View {
                 Text(message)
                     .font(.footnote)
                     .foregroundStyle(.red)  // dynamic system red
+            }
+        }
+        .onChange(of: keyboard) {
+            // If the user is typing, briefly drop and restore focus to apply the new keyboard
+            if isFocused {
+                isFocused = false
+                DispatchQueue.main.async { isFocused = true }
             }
         }
     }

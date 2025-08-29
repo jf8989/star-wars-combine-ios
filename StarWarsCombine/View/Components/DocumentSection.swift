@@ -21,8 +21,9 @@ struct DocumentSection: View {
                     ? "Document number (8 digits)" : "Passport",
                 text: $vm.documentNumber,
                 state: vm.documentNumberState,
-                contentType: nil,  // no content type wanted; pass nil (fixes `.none` error)
-                keyboard: vm.documentType == .id ? .numberPad : .asciiCapable
+                contentType: nil,
+                keyboard: vm.documentType == .id ? .numberPad : .asciiCapable,
+                autocap: .never
             )
         }
     }

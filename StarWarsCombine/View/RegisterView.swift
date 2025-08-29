@@ -15,7 +15,8 @@ struct RegisterView: View {
                     text: $vm.name,
                     state: vm.nameState,
                     contentType: .givenName,
-                    keyboard: .default
+                    keyboard: .default,
+                    autocap: .words
                 )
 
                 UnderlinedField(
@@ -23,7 +24,8 @@ struct RegisterView: View {
                     text: $vm.lastName,
                     state: vm.lastNameState,
                     contentType: .familyName,
-                    keyboard: .default
+                    keyboard: .default,
+                    autocap: .words
                 )
 
                 UnderlinedField(
@@ -31,7 +33,8 @@ struct RegisterView: View {
                     text: $vm.age,
                     state: vm.ageState,
                     contentType: nil,
-                    keyboard: .numberPad
+                    keyboard: .numberPad,
+                    autocap: .never
                 )
 
                 UnderlinedField(
@@ -39,7 +42,8 @@ struct RegisterView: View {
                     text: $vm.phone,
                     state: vm.phoneState,
                     contentType: .telephoneNumber,
-                    keyboard: .numberPad
+                    keyboard: .numberPad,
+                    autocap: .never
                 )
 
                 UnderlinedField(
@@ -47,7 +51,8 @@ struct RegisterView: View {
                     text: $vm.email,
                     state: vm.emailState,
                     contentType: .emailAddress,
-                    keyboard: .emailAddress
+                    keyboard: .emailAddress,
+                    autocap: .never
                 )
 
                 DocumentSection(vm: vm)

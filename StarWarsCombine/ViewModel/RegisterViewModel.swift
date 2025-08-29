@@ -109,7 +109,7 @@ public final class RegisterViewModel: ObservableObject {
         let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !s.isEmpty else { return .idle }
         return RegisterValidation.validateAge(s)
-            ? .valid : .invalid(message: "Age must be 18 or older.")
+            ? .valid : .invalid(message: "Age must be over 18.")
     }
 
     private static func stateForPhone(_ raw: String) -> FieldState {
@@ -136,7 +136,9 @@ public final class RegisterViewModel: ObservableObject {
         switch type {
         case .id: return .invalid(message: "ID must be exactly 8 digits.")
         case .passport:
-            return .invalid(message: "Passport must be 9 characters long, first must be a letter, remaining are letters or digits")
+            return .invalid(
+                message: "Passport: 1 letter + 8 letters/digits (9 total)."
+            )
         }
     }
 }

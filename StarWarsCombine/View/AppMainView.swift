@@ -1,66 +1,40 @@
 // File: /View/AppMainView.swift
+// PATCH: replace the Phase-0 placeholder screens with real views + VM injection.
 
 import SwiftUI
 
 struct AppMainView: View {
     @State private var path: [Route] = []
 
+    // ViewModels (persist for session)
+    @StateObject private var registerVM = RegisterViewModel()
+    @StateObject private var planetsVM: PlanetsViewModel = {
+        let http = URLSessionHTTPClient()
+        let service = PlanetsServiceImpl(http: http)  // base defaults to swapi.info
+        return PlanetsViewModel(service: service)
+    }()
+
     var body: some View {
         NavigationStack(path: $path) {
-            RegisterPlaceholderView(onSignUp: {
-                // Phase 0: show nav wiring; real validation arrives in Phase 2/3.
-                path.append(.planets)
-            })
-            .navigationTitle("Register")
-            .navigationDestination(for: Route.self) { route in
-                switch route {
-                case .register:
-                    RegisterPlaceholderView(onSignUp: { path.append(.planets) })
-                case .planets:
-                    PlanetsPlaceholderView()
+            RegisterView(vm: registerVM)
+                .onChange(of: registerVM.shouldNavigateToPlanets) { _, should in
+                    if should {
+                        path.append(.planets)
+                        registerVM.shouldNavigateToPlanets = false
+                    }
                 }
-            }
+                .navigationDestination(for: Route.self) { route in
+                    switch route {
+                    case .register:
+                        RegisterView(vm: registerVM)
+                    case .planets:
+                        PlanetsView(vm: planetsVM)
+                    }
+                }
         }
     }
 }
 
-private struct RegisterPlaceholderView: View {
-    let onSignUp: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("Register Screen")
-                .font(.title2)
-            Text("Phase 0 placeholder — fields & validation land in Phase 2/3.")
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-
-            Button("Sign Up → Planets") {
-                onSignUp()
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .padding()
-    }
-}
-
-private struct PlanetsPlaceholderView: View {
-    var body: some View {
-        VStack(spacing: 12) {
-            Text("Planets")
-                .font(.largeTitle)
-            Text("Phase 0 placeholder — list & pagination arrive later.")
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.background)
-    }
-}
-
-#Preview("iPhone") {
-    AppMainView()
-}
-
-#Preview("iPad") {
+#Preview("App") {
     AppMainView()
 }

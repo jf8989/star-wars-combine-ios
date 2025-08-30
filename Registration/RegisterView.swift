@@ -55,9 +55,9 @@ struct RegisterView: View {
                     autocap: .never
                 )
 
-                DocumentSection(vm: vm)
+                DocumentSectionView(vm: vm)
 
-                PrimaryButton(
+                PrimaryButtonView(
                     title: "Sign Up → Planets",
                     isEnabled: vm.isFormValid
                 ) {

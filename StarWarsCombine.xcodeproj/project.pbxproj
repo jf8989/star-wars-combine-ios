@@ -16,16 +16,6 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		74C297012E626A5500E5F8D9 /* Planets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Planets;
-			sourceTree = "<group>";
-		};
-		74C297032E626A6200E5F8D9 /* Registration */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Registration;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,8 +33,6 @@
 			isa = PBXGroup;
 			children = (
 				74AC70A32E60C5A100741F69 /* App */,
-				74C297032E626A6200E5F8D9 /* Registration */,
-				74C297012E626A5500E5F8D9 /* Planets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -65,8 +53,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				74AC70A32E60C5A100741F69 /* App */,
-				74C297012E626A5500E5F8D9 /* Planets */,
-				74C297032E626A6200E5F8D9 /* Registration */,
 			);
 			name = StarWarsCombine;
 			packageProductDependencies = (

@@ -43,7 +43,10 @@ struct PlanetsView: View {
                         }
                         .padding(.vertical, 4)
                         .onAppear {
-                            vm.loadNextPageIfNeeded(currentIndex: index)
+                            // Auto–infinite scroll only for real server paging.
+                            if vm.hasServerPaging {
+                                vm.loadNextPageIfNeeded(currentIndex: index)
+                            }
                         }
                     }
 

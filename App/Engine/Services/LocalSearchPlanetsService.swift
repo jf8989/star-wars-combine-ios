@@ -26,8 +26,11 @@ public final class LocalSearchPlanetsService: PlanetsService {
     private let searchLatency: DispatchQueue.SchedulerTimeType.Stride =
         .milliseconds(120)
 
-    public init(base: PlanetsService) {
+    private let backfillAll: Bool
+
+    public init(base: PlanetsService, backfillAll: Bool = false) {
         self.base = base
+        self.backfillAll = backfillAll
     }
 
     // MARK: - PlanetsService
@@ -96,6 +99,7 @@ public final class LocalSearchPlanetsService: PlanetsService {
     // MARK: - Background backfill (memory-only; no persistence)
 
     private func triggerBackfillIfNeeded() {
+        guard backfillAll else { return }  // honor single-call policy
         queue.async { [weak self] in
             guard let self, !self.isBackfilling, let url = self.nextURL else {
                 return

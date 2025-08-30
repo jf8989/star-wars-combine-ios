@@ -41,6 +41,9 @@ public final class PlanetsViewModel: ObservableObject {
         return browsingPlanets.count > planets.count  // client paging
     }
 
+    /// True only when the API exposes a `next` URL.
+    public var hasServerPaging: Bool { nextURL != nil }
+
     public init(service: PlanetsService) {
         self.service = service
         bindSearchPipeline()

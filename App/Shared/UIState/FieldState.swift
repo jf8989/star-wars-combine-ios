@@ -5,7 +5,6 @@ import Foundation
 /// Per-input UI state that the View binds to (colors/messages).
 public enum FieldState: Equatable {
     case idle
-    case typing
     case valid
     case invalid(message: String)
 }

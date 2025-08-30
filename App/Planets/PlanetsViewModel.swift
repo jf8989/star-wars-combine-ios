@@ -146,12 +146,12 @@ public final class PlanetsViewModel: ObservableObject {
     }
 
     private func performSearch(_ term: String) {
-        let q = term.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedTerm = term.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Cancel any in-flight search
         searchCancellable?.cancel()
 
-        guard !q.isEmpty else {
+        guard !trimmedTerm.isEmpty else {
             // Restore the current browsing slice without refetching
             mode = .browsing
             planets = pager.slice(browsingPlanets)
@@ -160,15 +160,15 @@ public final class PlanetsViewModel: ObservableObject {
 
         mode = .searching
         isLoading = true
-        searchCancellable = service.searchPlanets(query: q)
+        searchCancellable = service.searchPlanets(query: trimmedTerm)
             .receive(on: DispatchQueue.main)
             .map { PlanetsSorting.alpha($0.planets) }
             .sink(
                 receiveCompletion: { [weak self] completion in
                     self?.finishLoading(with: completion)
                 },
-                receiveValue: { [weak self] items in
-                    self?.planets = items
+                receiveValue: { [weak self] results in
+                    self?.planets = results
                 }
             )
     }

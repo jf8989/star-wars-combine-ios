@@ -12,6 +12,6 @@ struct PlanetsView: View {
 
 #Preview("Planets") {
     let http = URLSessionHTTPClient()
-    let svc = PlanetsServiceImpl(http: http)
+    let svc = PlanetsServiceLive(http: http)
     PlanetsView(vm: PlanetsViewModel(service: svc))
 }

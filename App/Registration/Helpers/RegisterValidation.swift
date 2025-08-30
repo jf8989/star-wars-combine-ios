@@ -14,14 +14,14 @@ public enum RegisterValidation {
 
     /// Non-empty name with at least 2 non-space characters.
     public static func validateName(_ raw: String) -> Bool {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        return s.count >= 2
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.count >= 2
     }
 
     /// Non-empty last name with at least 2 non-space characters.
     public static func validateLastName(_ raw: String) -> Bool {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        return s.count >= 2
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.count >= 2
     }
 
     /// Age must be an integer in [18, 120].
@@ -40,7 +40,7 @@ public enum RegisterValidation {
 
     /// Basic email rule: something@something.tld (TLD length >= 2). Intentionally simple.
     public static func validateEmailBasic(_ raw: String) -> Bool {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         // Quick-and-clean regex, not exhaustive (by design for the assignment).
         let pattern = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
         return
@@ -49,8 +49,8 @@ public enum RegisterValidation {
                 options: [.caseInsensitive]
             ))?
             .firstMatch(
-                in: s,
-                range: NSRange(location: 0, length: s.utf16.count)
+                in: trimmed,
+                range: NSRange(location: 0, length: trimmed.utf16.count)
             ) != nil
     }
 
@@ -60,14 +60,16 @@ public enum RegisterValidation {
     public static func validateDocNumber(_ raw: String, for type: DocumentType)
         -> Bool
     {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         switch type {
         case .id:
-            return s.count == 8 && s.allSatisfy(\.isNumber)
+            return trimmed.count == 8 && trimmed.allSatisfy(\.isNumber)
         case .passport:
-            guard s.count == 9 else { return false }
-            guard let first = s.first, first.isLetter else { return false }
-            return s.dropFirst().unicodeScalars.allSatisfy {
+            guard trimmed.count == 9 else { return false }
+            guard let first = trimmed.first, first.isLetter else {
+                return false
+            }
+            return trimmed.dropFirst().unicodeScalars.allSatisfy {
                 CharacterSet.alphanumerics.contains($0)
             }
         }

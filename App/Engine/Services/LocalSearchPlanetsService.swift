@@ -17,8 +17,8 @@ public final class LocalSearchPlanetsService: PlanetsService {
     private var seenNames = Set<String>()  // simple de-dupe
     private var nextURL: URL?  // last known next from pass-through pages
     private var isBackfilling = false
-    private var bag = Set<AnyCancellable>()  // internal Combine bag
-    private let queue = DispatchQueue(
+    private var cancellables = Set<AnyCancellable>()  // internal Combine bag
+    private let indexQueue = DispatchQueue(
         label: "LocalSearch.Index",
         qos: .userInitiated
     )
@@ -69,39 +69,39 @@ public final class LocalSearchPlanetsService: PlanetsService {
     // MARK: - Indexing
 
     private func ingest(_ page: PlanetsPage) {
-        queue.async { [weak self] in
+        indexQueue.async { [weak self] in
             guard let self else { return }
-            for p in page.planets where self.seenNames.insert(p.name).inserted {
-                self.index.append(p)
+            for planet in page.planets where self.seenNames.insert(planet.name).inserted {
+                self.index.append(planet)
             }
             self.nextURL = page.next
         }
     }
 
-    private func filter(_ q: String) -> [Planet] {
-        let needle = q.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !needle.isEmpty else { return snapshotIndex() }
-        let opts: String.CompareOptions = [
+    private func filter(_ query: String) -> [Planet] {
+        let searchTerm = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !searchTerm.isEmpty else { return snapshotIndex() }
+        let compareOptions: String.CompareOptions = [
             .caseInsensitive, .diacriticInsensitive,
         ]
-        return snapshotIndex().filter { p in
-            p.name.range(of: needle, options: opts) != nil
-                || p.climate.range(of: needle, options: opts) != nil
-                || p.terrain.range(of: needle, options: opts) != nil
+        return snapshotIndex().filter { planet in
+            planet.name.range(of: searchTerm, options: compareOptions) != nil
+                || planet.climate.range(of: searchTerm, options: compareOptions) != nil
+                || planet.terrain.range(of: searchTerm, options: compareOptions) != nil
         }
     }
 
     private func snapshotIndex() -> [Planet] {
-        var copy: [Planet] = []
-        queue.sync { copy = self.index }
-        return copy
+        var snapshot: [Planet] = []
+        indexQueue.sync { snapshot = self.index }
+        return snapshot
     }
 
     // MARK: - Background backfill (memory-only; no persistence)
 
     private func triggerBackfillIfNeeded() {
         guard backfillAll else { return }  // honor single-call policy
-        queue.async { [weak self] in
+        indexQueue.async { [weak self] in
             guard let self, !self.isBackfilling, let url = self.nextURL else {
                 return
             }
@@ -112,7 +112,7 @@ public final class LocalSearchPlanetsService: PlanetsService {
 
     private func walk(from url: URL) {
         base.fetchPage(at: url)
-            .receive(on: queue)
+            .receive(on: indexQueue)
             .sink(
                 receiveCompletion: { [weak self] completion in
                     guard let self else { return }
@@ -131,6 +131,6 @@ public final class LocalSearchPlanetsService: PlanetsService {
                     }
                 }
             )
-            .store(in: &bag)
+            .store(in: &cancellables)
     }
 }

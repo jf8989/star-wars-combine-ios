@@ -45,11 +45,11 @@ public final class PlanetsServiceLive: PlanetsService {
         http.get(url: url)
             .tryMap { [decoder] data -> PlanetsPage in
                 // 1) Try swapi.dev shape: { count, next, previous, results: [PlanetDTO] }
-                if let dto = try? decoder.decode(
+                if let pageDTO = try? decoder.decode(
                     PlanetsPageDTO.self,
                     from: data
                 ) {
-                    let planets = dto.results.map {
+                    let planets = pageDTO.results.map {
                         Planet(
                             name: $0.name,
                             climate: $0.climate,
@@ -59,13 +59,13 @@ public final class PlanetsServiceLive: PlanetsService {
                             population: $0.population
                         )
                     }
-                    let nextURL = dto.next.flatMap(URL.init(string:))
+                    let nextURL = pageDTO.next.flatMap(URL.init(string:))
                     return PlanetsPage(next: nextURL, planets: planets)
                 }
 
                 // 2) Try swapi.info shape: raw array [PlanetDTO]
-                if let arr = try? decoder.decode([PlanetDTO].self, from: data) {
-                    let planets = arr.map {
+                if let planetDTOs = try? decoder.decode([PlanetDTO].self, from: data) {
+                    let planets = planetDTOs.map {
                         Planet(
                             name: $0.name,
                             climate: $0.climate,
@@ -79,15 +79,15 @@ public final class PlanetsServiceLive: PlanetsService {
                 }
 
                 // 3) Defensive: single planet payload (rare, but harmless)
-                if let single = try? decoder.decode(PlanetDTO.self, from: data)
+                if let planetDTO = try? decoder.decode(PlanetDTO.self, from: data)
                 {
                     let p = Planet(
-                        name: single.name,
-                        climate: single.climate,
-                        gravity: single.gravity,
-                        terrain: single.terrain,
-                        diameter: single.diameter,
-                        population: single.population
+                        name: planetDTO.name,
+                        climate: planetDTO.climate,
+                        gravity: planetDTO.gravity,
+                        terrain: planetDTO.terrain,
+                        diameter: planetDTO.diameter,
+                        population: planetDTO.population
                     )
                     return PlanetsPage(next: nil, planets: [p])
                 }

@@ -16,7 +16,7 @@ struct DocumentSectionView: View {
             }
             .pickerStyle(.segmented)
 
-            UnderlinedField(
+            UnderlinedFieldView(
                 title: vm.documentType == .id
                     ? "Document number (8 digits)" : "Passport",
                 text: $vm.documentNumber,

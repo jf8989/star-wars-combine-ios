@@ -3,7 +3,7 @@
 import SwiftUI
 
 /// Tiny subview used by PlanetCard to render a key/value with an icon.
-struct PlanetStatRow: View {
+struct PlanetStatRowView: View {
     let title: String
     let systemImage: String
     let value: String

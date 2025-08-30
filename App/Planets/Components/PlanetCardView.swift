@@ -3,7 +3,7 @@
 import SwiftUI
 
 /// Visual card representing a single Planet.
-struct PlanetCard: View {
+struct PlanetCardView: View {
     let planet: Planet
 
     var body: some View {
@@ -17,31 +17,31 @@ struct PlanetCard: View {
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6)
             {
                 GridRow {
-                    PlanetStatRow(
+                    PlanetStatRowView(
                         title: "Climate",
                         systemImage: "wind",
                         value: planet.climate
                     )
-                    PlanetStatRow(
+                    PlanetStatRowView(
                         title: "Terrain",
                         systemImage: "leaf",
                         value: planet.terrain
                     )
                 }
                 GridRow {
-                    PlanetStatRow(
+                    PlanetStatRowView(
                         title: "Gravity",
                         systemImage: "g.circle",
                         value: planet.gravity
                     )
-                    PlanetStatRow(
+                    PlanetStatRowView(
                         title: "Diameter",
                         systemImage: "ruler",
                         value: planet.diameter
                     )
                 }
                 GridRow {
-                    PlanetStatRow(
+                    PlanetStatRowView(
                         title: "Population",
                         systemImage: "person.3",
                         value: planet.population

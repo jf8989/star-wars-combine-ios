@@ -3,7 +3,7 @@
 import SwiftUI
 
 /// Screen shell: backdrop, search, pager, lifecycle & alert.
-struct PlanetsScreen: View {
+struct PlanetsScreenView: View {
     @ObservedObject var vm: PlanetsViewModel
 
     var body: some View {
@@ -18,7 +18,7 @@ struct PlanetsScreen: View {
             .ignoresSafeArea()
 
             VStack(spacing: 12) {
-                PlanetsSearchBar(text: $vm.searchTerm)
+                PlanetsSearchBarView(text: $vm.searchTerm)
                 PlanetsPagerView(vm: vm)
             }
             .padding(.top, 8)

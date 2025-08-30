@@ -10,7 +10,7 @@ struct RegisterView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                UnderlinedField(
+                UnderlinedFieldView(
                     title: "Name",
                     text: $vm.name,
                     state: vm.nameState,
@@ -19,7 +19,7 @@ struct RegisterView: View {
                     autocap: .words
                 )
 
-                UnderlinedField(
+                UnderlinedFieldView(
                     title: "Last name",
                     text: $vm.lastName,
                     state: vm.lastNameState,
@@ -28,7 +28,7 @@ struct RegisterView: View {
                     autocap: .words
                 )
 
-                UnderlinedField(
+                UnderlinedFieldView(
                     title: "Age",
                     text: $vm.age,
                     state: vm.ageState,
@@ -37,7 +37,7 @@ struct RegisterView: View {
                     autocap: .never
                 )
 
-                UnderlinedField(
+                UnderlinedFieldView(
                     title: "Phone (8 digits)",
                     text: $vm.phone,
                     state: vm.phoneState,
@@ -46,7 +46,7 @@ struct RegisterView: View {
                     autocap: .never
                 )
 
-                UnderlinedField(
+                UnderlinedFieldView(
                     title: "Email",
                     text: $vm.email,
                     state: vm.emailState,

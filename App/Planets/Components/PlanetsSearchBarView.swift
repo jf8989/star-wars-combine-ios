@@ -3,7 +3,7 @@
 import SwiftUI
 
 /// Standalone search bar used by the Planets screen.
-struct PlanetsSearchBar: View {
+struct PlanetsSearchBarView: View {
     @Binding var text: String
 
     var body: some View {

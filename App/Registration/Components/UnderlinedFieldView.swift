@@ -6,7 +6,7 @@ import UIKit
 /// Underlined text field that adapts to FieldState and Light/Dark mode.
 /// - `autocap` controls capitalization per field (default .words).
 /// - Blue underline while typing is driven by focus (view concern).
-struct UnderlinedField: View {
+struct UnderlinedFieldView: View {
     let title: String
     @Binding var text: String
     let state: FieldState

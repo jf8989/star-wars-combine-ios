@@ -26,7 +26,7 @@ struct PlanetsPagerView: View {
                     ForEach(Array(vm.planets.enumerated()), id: \.element) {
                         _,
                         planet in
-                        PlanetCard(planet: planet)
+                        PlanetCardView(planet: planet)
                             .transition(
                                 .opacity.combined(with: .scale(scale: 0.98))
                             )

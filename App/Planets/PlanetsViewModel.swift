@@ -6,7 +6,7 @@ import Foundation
 /// ViewModel for the Planets screen.
 /// - Page-turn UX (client-side slicing) that also works with server paging via `next`
 /// - Loading + alert mapping
-/// - Extra Credit: debounced search that preserves paging state on clear
+/// - Extra Credit: debounced search that preserves paging slice on clear
 @MainActor
 public final class PlanetsViewModel: ObservableObject {
     // MARK: - Published UI state
@@ -15,9 +15,11 @@ public final class PlanetsViewModel: ObservableObject {
     @Published public var alert: String? = nil
     @Published public var searchTerm: String = ""
     @Published public private(set) var mode: Mode = .browsing
-    @Published public private(set) var currentPage: Int = 0  // 0-based for slicing
+    @Published public private(set) var currentPage: Int = 0  // 0-based
+    @Published public private(set) var pageDirection: PageDirection = .forward
 
     public enum Mode { case browsing, searching }
+    public enum PageDirection { case forward, backward }
 
     // MARK: - Dependencies
     private let service: PlanetsService
@@ -50,7 +52,6 @@ public final class PlanetsViewModel: ObservableObject {
     /// UI indicator: total pages. For server paging we show "?" until `next` is nil.
     public var totalPagesDisplay: String {
         if hasServerPaging {
-            // When server-paged, total is unknown until no `next` remains.
             if nextURL == nil {
                 let total = max(
                     1,
@@ -95,6 +96,7 @@ public final class PlanetsViewModel: ObservableObject {
 
     public func goNextPage() {
         guard mode == .browsing else { return }
+        pageDirection = .forward
 
         // If we already have enough items locally for the next slice, page forward.
         let nextStart = (currentPage + 1) * pageSize
@@ -115,7 +117,9 @@ public final class PlanetsViewModel: ObservableObject {
                 },
                 receiveValue: { [weak self] page in
                     guard let self else { return }
+                    // Merge, then keep global alphabetical order
                     self.browsingPlanets.append(contentsOf: page.planets)
+                    self.browsingPlanets = self.sorted(self.browsingPlanets)
                     self.nextURL = page.next
                     self.currentPage += 1
                     self.planets = self.sliceForCurrentPage()
@@ -125,6 +129,7 @@ public final class PlanetsViewModel: ObservableObject {
 
     public func goPrevPage() {
         guard mode == .browsing, currentPage > 0 else { return }
+        pageDirection = .backward
         currentPage -= 1
         planets = sliceForCurrentPage()
     }
@@ -132,7 +137,7 @@ public final class PlanetsViewModel: ObservableObject {
     // MARK: - Search (Extra Credit)
     private func bindSearchPipeline() {
         $searchTerm
-            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] term in
                 self?.performSearch(term)
@@ -162,12 +167,19 @@ public final class PlanetsViewModel: ObservableObject {
                     self?.finishLoading(with: completion)
                 },
                 receiveValue: { [weak self] page in
-                    self?.planets = page.planets
+                    self?.planets = self?.sorted(page.planets) ?? page.planets
                 }
             )
     }
 
-    // MARK: - Helpers (kept small per mandate)
+    // MARK: - Helpers
+    private func sorted(_ items: [Planet]) -> [Planet] {
+        items.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name)
+                == .orderedAscending
+        }
+    }
+
     private func sliceForCurrentPage() -> [Planet] {
         let start = currentPage * pageSize
         let end = min(browsingPlanets.count, start + pageSize)
@@ -176,7 +188,7 @@ public final class PlanetsViewModel: ObservableObject {
     }
 
     private func ingestFirst(page: PlanetsPage) {
-        browsingPlanets = page.planets
+        browsingPlanets = sorted(page.planets)
         nextURL = page.next
         currentPage = 0
         planets = sliceForCurrentPage()
@@ -187,8 +199,6 @@ public final class PlanetsViewModel: ObservableObject {
         with completion: Subscribers.Completion<AppError>
     ) {
         isLoading = false
-        if case .failure(let err) = completion {
-            alert = err.userMessage
-        }
+        if case .failure(let err) = completion { alert = err.userMessage }
     }
 }

@@ -9,7 +9,8 @@ struct AppMainView: View {
     @StateObject private var registerVM = RegisterViewModel()
     @StateObject private var planetsVM: PlanetsViewModel = {
         let http = URLSessionHTTPClient()
-        let service = PlanetsServiceImpl(http: http)  // base defaults to swapi.info
+        let real = PlanetsServiceImpl(http: http)  // network
+        let service = LocalSearchPlanetsService(base: real)  // decorate: search is local
         return PlanetsViewModel(service: service)
     }()
 

@@ -1,9 +1,9 @@
-// App/Registration/Components/PrimaryButton.swift
+// App/Main/Buttons.swift
 
 import SwiftUI
 
 /// Reusable primary button used by RegisterView.
-struct PrimaryButton: View {
+struct PrimaryButtonView: View {
     let title: String
     let isEnabled: Bool
     let action: () -> Void

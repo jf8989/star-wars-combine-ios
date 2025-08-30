@@ -5,7 +5,7 @@ import UIKit
 
 /// Small section holding Document type + number field.
 /// View-only concerns; uses UnderlinedField internally.
-struct DocumentSection: View {
+struct DocumentSectionView: View {
     @ObservedObject var vm: RegisterViewModel
 
     var body: some View {

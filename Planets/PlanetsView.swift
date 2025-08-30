@@ -55,6 +55,21 @@ struct PlanetsView: View {
                             Spacer()
                         }
                     }
+
+                    // Explicit Next button (only when a next page exists and we're not currently loading)
+                    if vm.canLoadMore {
+                        HStack {
+                            Spacer()
+                            Button("Next page") {
+                                // Trigger just as the last-row onAppear would
+                                vm.loadNextPageIfNeeded(
+                                    currentIndex: vm.planets.count - 1
+                                )
+                            }
+                            .buttonStyle(.bordered)
+                            Spacer()
+                        }
+                    }
                 }
                 .listStyle(.plain)
             }
@@ -71,9 +86,8 @@ struct PlanetsView: View {
             }
         }
         .navigationTitle("Planets")
-        // Belt & suspenders: ensure first load fires even if .task races
+        // Single trigger to avoid double loads/log noise
         .onAppear { if vm.planets.isEmpty { vm.loadFirstPage() } }
-        .task { if vm.planets.isEmpty { vm.loadFirstPage() } }
         .alert(
             "Network error",
             isPresented: Binding(

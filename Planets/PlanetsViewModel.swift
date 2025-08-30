@@ -27,6 +27,14 @@ public final class PlanetsViewModel: ObservableObject {
     private var pagingCancellable: AnyCancellable?
     private var searchCancellable: AnyCancellable?
 
+    // Keep a snapshot of the browsing list so we can restore it after search clears
+    private var browsingPlanets: [Planet] = []
+
+    // Expose whether a next page exists (for the "Next" button)
+    public var canLoadMore: Bool {
+        mode == .browsing && nextURL != nil && !isLoading
+    }
+
     public init(service: PlanetsService) {
         self.service = service
         bindSearchPipeline()
@@ -50,6 +58,7 @@ public final class PlanetsViewModel: ObservableObject {
                 receiveValue: { [weak self] page in
                     guard let self else { return }
                     self.planets = page.planets
+                    self.browsingPlanets = page.planets
                     self.nextURL = page.next
                 }
             )
@@ -76,6 +85,7 @@ public final class PlanetsViewModel: ObservableObject {
                 receiveValue: { [weak self] page in
                     guard let self else { return }
                     self.planets.append(contentsOf: page.planets)
+                    self.browsingPlanets = self.planets
                     self.nextURL = page.next
                 }
             )
@@ -100,11 +110,13 @@ public final class PlanetsViewModel: ObservableObject {
         searchCancellable?.cancel()
 
         guard !q.isEmpty else {
-            // Restore browsing list
+            // Restore the last known browsing list; fetch only if we truly have nothing.
             mode = .browsing
-            planets.removeAll()
-            nextURL = nil
-            loadFirstPage()
+            if browsingPlanets.isEmpty {
+                if planets.isEmpty { loadFirstPage() }
+            } else {
+                planets = browsingPlanets
+            }
             return
         }
 

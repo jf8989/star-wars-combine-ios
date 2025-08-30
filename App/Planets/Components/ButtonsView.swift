@@ -1,4 +1,4 @@
-// App/Main/Components/Buttons.swift
+// App/Planets/Components/Buttons.swift
 
 import SwiftUI
 

@@ -1,4 +1,4 @@
-// App/Registration/UIState/FieldState.swift
+// App/Shared/UIState/FieldState.swift
 
 import Foundation
 

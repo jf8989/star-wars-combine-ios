@@ -1,49 +1,75 @@
-// App/Planets/PlanetsViewModel.swift
+// File: /App/Planets/PlanetsViewModel.swift
 
 import Combine
 import Foundation
 
 /// ViewModel for the Planets screen.
-/// - Paging using SWAPI's `next` URL
+/// - Page-turn UX (client-side slicing) that also works with server paging via `next`
 /// - Loading + alert mapping
-/// - Extra Credit: debounced remote search on same list surface
+/// - Extra Credit: debounced search that preserves paging state on clear
 @MainActor
 public final class PlanetsViewModel: ObservableObject {
-    // Published UI state
+    // MARK: - Published UI state
     @Published public private(set) var planets: [Planet] = []
     @Published public private(set) var isLoading: Bool = false
     @Published public var alert: String? = nil
     @Published public var searchTerm: String = ""
     @Published public private(set) var mode: Mode = .browsing
+    @Published public private(set) var currentPage: Int = 0  // 0-based for slicing
 
     public enum Mode { case browsing, searching }
 
-    // Dependencies
+    // MARK: - Dependencies
     private let service: PlanetsService
     private let bag = TaskBag()
 
-    // Paging
+    // MARK: - Paging (server + client)
     private var nextURL: URL?
     private var pagingCancellable: AnyCancellable?
     private var searchCancellable: AnyCancellable?
 
-    // Browsing snapshot (all items we've fetched so far)
+    // Browsing snapshot (all items fetched/known so far)
     private var browsingPlanets: [Planet] = []
 
-    // Client-side paging state (used when nextURL == nil)
-    private let clientPageSize = 10
-    private var clientPage = 1
+    // Page-turn config (client-side slice size)
+    private let pageSize = 10
 
     // Can we load more? (server OR client)
     public var canLoadMore: Bool {
         guard mode == .browsing, !isLoading else { return false }
         if nextURL != nil { return true }  // server paging available
-        return browsingPlanets.count > planets.count  // client paging
+        return (currentPage + 1) * pageSize < browsingPlanets.count  // client paging
     }
 
     /// True only when the API exposes a `next` URL.
     public var hasServerPaging: Bool { nextURL != nil }
 
+    /// UI indicator: current page number (1-based)
+    public var currentPageDisplay: Int { currentPage + 1 }
+
+    /// UI indicator: total pages. For server paging we show "?" until `next` is nil.
+    public var totalPagesDisplay: String {
+        if hasServerPaging {
+            // When server-paged, total is unknown until no `next` remains.
+            if nextURL == nil {
+                let total = max(
+                    1,
+                    Int(ceil(Double(browsingPlanets.count) / Double(pageSize)))
+                )
+                return String(total)
+            } else {
+                return "?"
+            }
+        } else {
+            let total = max(
+                1,
+                Int(ceil(Double(browsingPlanets.count) / Double(pageSize)))
+            )
+            return String(total)
+        }
+    }
+
+    // MARK: - Init
     public init(service: PlanetsService) {
         self.service = service
         bindSearchPipeline()
@@ -54,74 +80,56 @@ public final class PlanetsViewModel: ObservableObject {
         guard mode == .browsing, !isLoading else { return }
         isLoading = true
         pagingCancellable?.cancel()
+
         pagingCancellable = service.fetchFirstPage()
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
-                    guard let self else { return }
-                    self.isLoading = false
-                    if case .failure(let err) = completion {
-                        self.alert = err.userMessage
-                    }
+                    self?.finishLoading(with: completion)
                 },
                 receiveValue: { [weak self] page in
-                    guard let self else { return }
-                    self.browsingPlanets = page.planets
-                    self.nextURL = page.next
-                    // Show first slice (client) or whole first page (server)
-                    if self.nextURL == nil {
-                        self.clientPage = 1
-                        self.planets = Array(
-                            self.browsingPlanets.prefix(self.clientPageSize)
-                        )
-                    } else {
-                        self.planets = page.planets
-                    }
+                    self?.ingestFirst(page: page)
                 }
             )
     }
 
-    public func loadNextPageIfNeeded(currentIndex: Int) {
-        guard mode == .browsing, !isLoading else { return }
+    public func goNextPage() {
+        guard mode == .browsing else { return }
 
-        // Server paging path
-        if let url = nextURL {
-            guard currentIndex >= planets.count - 1 else { return }
-            isLoading = true
-            pagingCancellable = service.fetchPage(at: url)
-                .receive(on: DispatchQueue.main)
-                .sink(
-                    receiveCompletion: { [weak self] completion in
-                        guard let self else { return }
-                        self.isLoading = false
-                        if case .failure(let err) = completion {
-                            self.alert = err.userMessage
-                        }
-                    },
-                    receiveValue: { [weak self] page in
-                        guard let self else { return }
-                        self.planets.append(contentsOf: page.planets)
-                        self.browsingPlanets = self.planets
-                        self.nextURL = page.next
-                    }
-                )
+        // If we already have enough items locally for the next slice, page forward.
+        let nextStart = (currentPage + 1) * pageSize
+        if nextStart < browsingPlanets.count {
+            currentPage += 1
+            planets = sliceForCurrentPage()
             return
         }
 
-        // Client paging path (no server `next`)
-        guard currentIndex >= planets.count - 1 else { return }
-        let nextCount = min(
-            browsingPlanets.count,
-            (clientPage + 1) * clientPageSize
-        )
-        if nextCount > planets.count {
-            clientPage += 1
-            planets = Array(browsingPlanets.prefix(nextCount))
-        }
+        // Otherwise, fetch the next server page if present; then advance.
+        guard let url = nextURL, !isLoading else { return }
+        isLoading = true
+        pagingCancellable = service.fetchPage(at: url)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    self?.finishLoading(with: completion)
+                },
+                receiveValue: { [weak self] page in
+                    guard let self else { return }
+                    self.browsingPlanets.append(contentsOf: page.planets)
+                    self.nextURL = page.next
+                    self.currentPage += 1
+                    self.planets = self.sliceForCurrentPage()
+                }
+            )
+    }
+
+    public func goPrevPage() {
+        guard mode == .browsing, currentPage > 0 else { return }
+        currentPage -= 1
+        planets = sliceForCurrentPage()
     }
 
     // MARK: - Search (Extra Credit)
-
     private func bindSearchPipeline() {
         $searchTerm
             .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
@@ -139,23 +147,9 @@ public final class PlanetsViewModel: ObservableObject {
         searchCancellable?.cancel()
 
         guard !q.isEmpty else {
-            // Restore the last known browsing list; fetch only if we truly have nothing.
+            // Restore the current browsing slice without refetching
             mode = .browsing
-            if browsingPlanets.isEmpty {
-                if planets.isEmpty { loadFirstPage() }
-            } else {
-                // Restore client/server paging presentation
-                if nextURL == nil {
-                    clientPage = max(1, clientPage)  // keep current page count
-                    let count = min(
-                        browsingPlanets.count,
-                        clientPage * clientPageSize
-                    )
-                    planets = Array(browsingPlanets.prefix(count))
-                } else {
-                    planets = browsingPlanets
-                }
-            }
+            planets = sliceForCurrentPage()
             return
         }
 
@@ -165,15 +159,36 @@ public final class PlanetsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
-                    guard let self else { return }
-                    self.isLoading = false
-                    if case .failure(let err) = completion {
-                        self.alert = err.userMessage
-                    }
+                    self?.finishLoading(with: completion)
                 },
                 receiveValue: { [weak self] page in
                     self?.planets = page.planets
                 }
             )
+    }
+
+    // MARK: - Helpers (kept small per mandate)
+    private func sliceForCurrentPage() -> [Planet] {
+        let start = currentPage * pageSize
+        let end = min(browsingPlanets.count, start + pageSize)
+        guard start < end else { return [] }
+        return Array(browsingPlanets[start..<end])
+    }
+
+    private func ingestFirst(page: PlanetsPage) {
+        browsingPlanets = page.planets
+        nextURL = page.next
+        currentPage = 0
+        planets = sliceForCurrentPage()
+        isLoading = false
+    }
+
+    private func finishLoading(
+        with completion: Subscribers.Completion<AppError>
+    ) {
+        isLoading = false
+        if case .failure(let err) = completion {
+            alert = err.userMessage
+        }
     }
 }

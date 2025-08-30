@@ -1,15 +1,17 @@
-// App/Planets/PlanetsView.swift
+// File: /App/Planets/PlanetsView.swift
 
 import SwiftUI
 
-/// Real Planets screen: title, search (EC), list with paging, spinner, alert.
+/// Planets screen: page-turn UX + local/remote search.
+/// - Browsing: Prev/Next buttons and swipe gestures flip pages (10 per page).
+/// - Searching: controls hide; list shows filtered results.
 struct PlanetsView: View {
     @ObservedObject var vm: PlanetsViewModel
 
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // Extra Credit: Search
+                // Search bar (EC)
                 HStack {
                     Image(systemName: "magnifyingglass")
                     TextField("Search planets…", text: $vm.searchTerm)
@@ -23,7 +25,7 @@ struct PlanetsView: View {
 
                 List {
                     ForEach(Array(vm.planets.enumerated()), id: \.element) {
-                        index,
+                        _,
                         planet in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(planet.name).font(.headline)
@@ -42,15 +44,9 @@ struct PlanetsView: View {
                             .foregroundStyle(.secondary)
                         }
                         .padding(.vertical, 4)
-                        .onAppear {
-                            // Auto–infinite scroll only for real server paging.
-                            if vm.hasServerPaging {
-                                vm.loadNextPageIfNeeded(currentIndex: index)
-                            }
-                        }
                     }
 
-                    // Loading row (when paging)
+                    // Loading row (server paging only)
                     if vm.isLoading && !vm.planets.isEmpty {
                         HStack {
                             Spacer()
@@ -59,19 +55,25 @@ struct PlanetsView: View {
                         }
                     }
 
-                    // Explicit Next button (only when a next page exists and we're not currently loading)
-                    if vm.canLoadMore {
-                        HStack {
-                            Spacer()
-                            Button("Next page") {
-                                // Trigger just as the last-row onAppear would
-                                vm.loadNextPageIfNeeded(
-                                    currentIndex: vm.planets.count - 1
-                                )
+                    // Page controls (browsing only)
+                    if vm.mode == .browsing {
+                        HStack(spacing: 16) {
+                            if vm.currentPageDisplay > 1 {
+                                Button("Prev") { vm.goPrevPage() }
+                                    .buttonStyle(.bordered)
                             }
-                            .buttonStyle(.bordered)
-                            Spacer()
+                            Text(
+                                "\(vm.currentPageDisplay)/\(vm.totalPagesDisplay)"
+                            )
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            if vm.canLoadMore {
+                                Button("Next") { vm.goNextPage() }
+                                    .buttonStyle(.bordered)
+                            }
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
                     }
                 }
                 .listStyle(.plain)
@@ -88,9 +90,25 @@ struct PlanetsView: View {
                     )
             }
         }
+        // Swipe left/right to turn pages (browsing only)
+        .gesture(
+            DragGesture(minimumDistance: 30)
+                .onEnded { value in
+                    let horizontal =
+                        abs(value.translation.width)
+                        > abs(value.translation.height)
+                    guard horizontal, vm.mode == .browsing else { return }
+                    if value.translation.width < 0 {
+                        vm.goNextPage()
+                    } else {
+                        vm.goPrevPage()
+                    }
+                }
+        )
         .navigationTitle("Planets")
-        // Single trigger to avoid double loads/log noise
-        .onAppear { if vm.planets.isEmpty { vm.loadFirstPage() } }
+        .onAppear {
+            if vm.planets.isEmpty { vm.loadFirstPage() }
+        }
         .alert(
             "Network error",
             isPresented: Binding(
@@ -107,6 +125,6 @@ struct PlanetsView: View {
 
 #Preview("Planets") {
     let http = URLSessionHTTPClient()
-    let svc = PlanetsServiceImpl(http: http)  // base defaults to swapi.info
+    let svc = PlanetsServiceImpl(http: http)  // preview can use the raw service
     PlanetsView(vm: PlanetsViewModel(service: svc))
 }

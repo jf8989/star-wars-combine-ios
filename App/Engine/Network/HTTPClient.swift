@@ -21,7 +21,7 @@ extension HTTPClient {
 public struct URLSessionHTTPClient: HTTPClient {
     private let session: URLSession
 
-    public init(configuration: URLSessionConfiguration = .default) {
+    init(configuration: URLSessionConfiguration = .default) {
         self.session = URLSession(configuration: configuration)
     }
 

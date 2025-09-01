@@ -10,16 +10,16 @@ import Foundation
 @MainActor
 public final class PlanetsViewModel: ObservableObject {
     // MARK: - Published UI state
-    @Published public private(set) var planets: [Planet] = []
-    @Published public private(set) var isLoading: Bool = false
-    @Published public var alert: String? = nil
-    @Published public var searchTerm: String = ""
-    @Published public private(set) var mode: Mode = .browsing
-    @Published public private(set) var currentPage: Int = 0  // mirror of pager.currentPage for animations
-    @Published public private(set) var pageDirection: PageDirection = .forward
+    @Published private(set) var planets: [Planet] = []
+    @Published private(set) var isLoading: Bool = false
+    @Published var alert: String? = nil
+    @Published var searchTerm: String = ""
+    @Published private(set) var mode: Mode = .browsing
+    @Published private(set) var currentPage: Int = 0  // mirror of pager.currentPage for animations
+    @Published private(set) var pageDirection: PageDirection = .forward
 
-    public enum Mode { case browsing, searching }
-    public enum PageDirection { case forward, backward }
+    enum Mode { case browsing, searching }
+    enum PageDirection { case forward, backward }
 
     // MARK: - Dependencies
     private let service: PlanetsService

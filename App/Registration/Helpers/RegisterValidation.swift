@@ -1,4 +1,4 @@
-// App/Engine/Helpers/RegisterValidation.swift
+// App/Registration/Helpers/RegisterValidation.swift
 
 import Foundation
 

@@ -10,25 +10,25 @@ import Foundation
 @MainActor
 public final class RegisterViewModel: ObservableObject {
     // Inputs
-    @Published public var name: String = ""
-    @Published public var lastName: String = ""
-    @Published public var age: String = ""
-    @Published public var phone: String = ""
-    @Published public var email: String = ""
-    @Published public var documentType: DocumentType = .id
-    @Published public var documentNumber: String = ""
+    @Published var name: String = ""
+    @Published var lastName: String = ""
+    @Published var age: String = ""
+    @Published var phone: String = ""
+    @Published var email: String = ""
+    @Published var documentType: DocumentType = .id
+    @Published var documentNumber: String = ""
 
     // UI states
-    @Published public private(set) var nameState: FieldState = .idle
-    @Published public private(set) var lastNameState: FieldState = .idle
-    @Published public private(set) var ageState: FieldState = .idle
-    @Published public private(set) var phoneState: FieldState = .idle
-    @Published public private(set) var emailState: FieldState = .idle
-    @Published public private(set) var documentNumberState: FieldState = .idle
+    @Published private(set) var nameState: FieldState = .idle
+    @Published private(set) var lastNameState: FieldState = .idle
+    @Published private(set) var ageState: FieldState = .idle
+    @Published private(set) var phoneState: FieldState = .idle
+    @Published private(set) var emailState: FieldState = .idle
+    @Published private(set) var documentNumberState: FieldState = .idle
 
     // Form + navigation
-    @Published public private(set) var isFormValid: Bool = false
-    @Published public var shouldNavigateToPlanets: Bool = false
+    @Published private(set) var isFormValid: Bool = false
+    @Published var shouldNavigateToPlanets: Bool = false
 
     private let bag = TaskBag()
 

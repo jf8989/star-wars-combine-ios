@@ -6,7 +6,7 @@ import SwiftUI
 struct PlanetsView: View {
     @ObservedObject var vm: PlanetsViewModel
     var body: some View {
-        PlanetsScreenView(vm: vm)
+        PlanetsScreenView(viewModel: vm)
     }
 }
 

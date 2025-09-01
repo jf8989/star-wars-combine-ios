@@ -4,7 +4,7 @@ import SwiftUI
 
 /// Screen shell: backdrop, search, pager, lifecycle & alert.
 struct PlanetsScreenView: View {
-    @ObservedObject var vm: PlanetsViewModel
+    @ObservedObject var viewModel: PlanetsViewModel
 
     var body: some View {
         ZStack {
@@ -18,12 +18,12 @@ struct PlanetsScreenView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 12) {
-                PlanetsSearchBarView(text: $vm.searchTerm)
-                PlanetsPagerView(vm: vm)
+                PlanetsSearchBarView(text: $viewModel.searchTerm)
+                PlanetsPagerView(vm: viewModel)
             }
             .padding(.top, 8)
 
-            if vm.isLoading && vm.planets.isEmpty {
+            if viewModel.isLoading && viewModel.planets.isEmpty {
                 ProgressView()
                     .scaleEffect(1.2)
                     .padding(24)
@@ -34,17 +34,17 @@ struct PlanetsScreenView: View {
             }
         }
         .navigationTitle("Planets")
-        .onAppear { if vm.planets.isEmpty { vm.loadFirstPage() } }
+        .onAppear { if viewModel.planets.isEmpty { viewModel.loadFirstPage() } }
         .alert(
             "Network error",
             isPresented: Binding(
-                get: { vm.alert != nil },
-                set: { if !$0 { vm.alert = nil } }
+                get: { viewModel.alert != nil },
+                set: { if !$0 { viewModel.alert = nil } }
             )
         ) {
-            Button("OK", role: .cancel) { vm.alert = nil }
+            Button("OK", role: .cancel) { viewModel.alert = nil }
         } message: {
-            Text(vm.alert ?? "")
+            Text(viewModel.alert ?? "")
         }
     }
 }

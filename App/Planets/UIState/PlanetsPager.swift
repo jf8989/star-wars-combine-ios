@@ -7,7 +7,7 @@ import Foundation
 public struct PlanetsPager {
     public private(set) var currentPage: Int = 0  // 0-based
     public let pageSize: Int
-
+ 
     public init(pageSize: Int = 10) {
         self.pageSize = pageSize
     }

@@ -5,7 +5,7 @@ import SwiftUI
 /// Standalone search bar used by the Planets screen.
 struct PlanetsSearchBarView: View {
     @Binding var text: String
-
+ 
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")

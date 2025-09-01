@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		74AC70A12E60C5A100741F69 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = StarWarsCombine.app; path = "/Users/jfma89/Documents/00 Development/StarWarsCombine/build/Debug-iphoneos/StarWarsCombine.app"; sourceTree = "<absolute>"; };
+		74FCA9702E63AD8400165A40 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsCombine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,6 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				74AC70A32E60C5A100741F69 /* App */,
+				74FCA9702E63AD8400165A40 /* StarWarsCombine.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,7 +59,7 @@
 			packageProductDependencies = (
 			);
 			productName = StarWarsCombine;
-			productReference = 74AC70A12E60C5A100741F69 /* StarWarsCombine.app */;
+			productReference = 74FCA9702E63AD8400165A40 /* StarWarsCombine.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

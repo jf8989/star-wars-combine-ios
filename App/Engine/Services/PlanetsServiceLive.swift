@@ -64,7 +64,10 @@ public final class PlanetsServiceLive: PlanetsService {
                 }
 
                 // 2) Try swapi.info shape: raw array [PlanetDTO]
-                if let planetDTOs = try? decoder.decode([PlanetDTO].self, from: data) {
+                if let planetDTOs = try? decoder.decode(
+                    [PlanetDTO].self,
+                    from: data
+                ) {
                     let planets = planetDTOs.map {
                         Planet(
                             name: $0.name,
@@ -79,8 +82,10 @@ public final class PlanetsServiceLive: PlanetsService {
                 }
 
                 // 3) Defensive: single planet payload (rare, but harmless)
-                if let planetDTO = try? decoder.decode(PlanetDTO.self, from: data)
-                {
+                if let planetDTO = try? decoder.decode(
+                    PlanetDTO.self,
+                    from: data
+                ) {
                     let p = Planet(
                         name: planetDTO.name,
                         climate: planetDTO.climate,

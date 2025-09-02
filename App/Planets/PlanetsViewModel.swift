@@ -10,7 +10,7 @@ import Foundation
 @MainActor
 public final class PlanetsViewModel: ObservableObject {
     // MARK: - Published UI state
-    @Published private(set) var planets: [Planet] = []
+    @Published private(set) var displayPlanets: [Planet] = []
     @Published private(set) var isLoading: Bool = false
     @Published var alert: String? = nil
     @Published var searchTerm: String = ""
@@ -83,7 +83,7 @@ public final class PlanetsViewModel: ObservableObject {
                     self.nextURL = page.next
                     self.pager.reset()
                     self.currentPage = pager.currentPage
-                    self.planets = self.pager.slice(browsingPlanets)
+                    self.displayPlanets = self.pager.slice(browsingPlanets)
                     self.isLoading = false
                 }
             )
@@ -96,7 +96,7 @@ public final class PlanetsViewModel: ObservableObject {
         // If we already have enough items locally, move the pager forward.
         if pager.stepForwardIfPossible(totalCount: browsingPlanets.count) {
             currentPage = pager.currentPage
-            planets = pager.slice(browsingPlanets)
+            displayPlanets = pager.slice(browsingPlanets)
             return
         }
 
@@ -120,7 +120,7 @@ public final class PlanetsViewModel: ObservableObject {
                         totalCount: self.browsingPlanets.count
                     )
                     self.currentPage = self.pager.currentPage
-                    self.planets = self.pager.slice(self.browsingPlanets)
+                    self.displayPlanets = self.pager.slice(self.browsingPlanets)
                 }
             )
     }
@@ -130,7 +130,7 @@ public final class PlanetsViewModel: ObservableObject {
         pageDirection = .backward
         if pager.stepBackward() {
             currentPage = pager.currentPage
-            planets = pager.slice(browsingPlanets)
+            displayPlanets = pager.slice(browsingPlanets)
         }
     }
 
@@ -154,7 +154,7 @@ public final class PlanetsViewModel: ObservableObject {
         guard !trimmedTerm.isEmpty else {
             // Restore the current browsing slice without refetching
             mode = .browsing
-            planets = pager.slice(browsingPlanets)
+            displayPlanets = pager.slice(browsingPlanets)
             return
         }
 
@@ -168,7 +168,7 @@ public final class PlanetsViewModel: ObservableObject {
                     self?.finishLoading(with: completion)
                 },
                 receiveValue: { [weak self] results in
-                    self?.planets = results
+                    self?.displayPlanets = results
                 }
             )
     }

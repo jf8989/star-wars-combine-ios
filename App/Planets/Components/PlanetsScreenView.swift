@@ -23,7 +23,7 @@ struct PlanetsScreenView: View {
             }
             .padding(.top, 8)
 
-            if viewModel.isLoading && viewModel.planets.isEmpty {
+            if viewModel.isLoading && viewModel.displayPlanets.isEmpty {
                 ProgressView()
                     .scaleEffect(1.2)
                     .padding(24)
@@ -34,7 +34,7 @@ struct PlanetsScreenView: View {
             }
         }
         .navigationTitle("Planets")
-        .onAppear { if viewModel.planets.isEmpty { viewModel.loadFirstPage() } }
+        .onAppear { if viewModel.displayPlanets.isEmpty { viewModel.loadFirstPage() } }
         .alert(
             "Network error",
             isPresented: Binding(

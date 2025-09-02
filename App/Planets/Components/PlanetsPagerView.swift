@@ -23,7 +23,7 @@ struct PlanetsPagerView: View {
         VStack(spacing: 8) {
             ScrollView {
                 LazyVStack(spacing: 12) {
-                    ForEach(Array(vm.planets.enumerated()), id: \.element) {
+                    ForEach(Array(vm.displayPlanets.enumerated()), id: \.element) {
                         _,
                         planet in
                         PlanetCardView(planet: planet)
@@ -32,7 +32,7 @@ struct PlanetsPagerView: View {
                             )
                     }
 
-                    if vm.isLoading && !vm.planets.isEmpty {
+                    if vm.isLoading && !vm.displayPlanets.isEmpty {
                         HStack {
                             Spacer()
                             ProgressView()

@@ -13,7 +13,7 @@ import Foundation
 /// PlanetsService, and `searchPlanets` returns an AnyPublisher<PlanetsPage, AppError>.
 public final class LocalSearchPlanetsService: PlanetsService {
     private let base: PlanetsService
-    private var index: [Planet] = []
+    private var fakeAPIlocalPlanetIndex: [Planet] = []
     private var seenNames = Set<String>()  // simple de-dupe
     private var nextURL: URL?  // last known next from pass-through pages
     private var isBackfilling = false
@@ -72,7 +72,7 @@ public final class LocalSearchPlanetsService: PlanetsService {
         indexQueue.async { [weak self] in
             guard let self else { return }
             for planet in page.planets where self.seenNames.insert(planet.name).inserted {
-                self.index.append(planet)
+                self.fakeAPIlocalPlanetIndex.append(planet)
             }
             self.nextURL = page.next
         }
@@ -93,7 +93,7 @@ public final class LocalSearchPlanetsService: PlanetsService {
 
     private func snapshotIndex() -> [Planet] {
         var snapshot: [Planet] = []
-        indexQueue.sync { snapshot = self.index }
+        indexQueue.sync { snapshot = self.fakeAPIlocalPlanetIndex }
         return snapshot
     }
 

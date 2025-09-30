@@ -3,10 +3,6 @@
 import Combine
 import Foundation
 
-/// ViewModel for the Register screen.
-/// - Holds raw field strings
-/// - Maps them to FieldState via pure Model validators
-/// - Exposes overall `isFormValid` (navigation handled by the View/Router)
 public final class RegisterViewModel: ObservableObject {
     // Inputs
     @Published var name: String = ""
@@ -32,14 +28,14 @@ public final class RegisterViewModel: ObservableObject {
 
     public init() {
         // Per-field states
-        $name.map(Self.stateForName).sink { [weak self] in self?.nameState = $0 }.store(in: bag)
-        $lastName.map(Self.stateForLastName).sink { [weak self] in self?.lastNameState = $0 }.store(in: bag)
-        $age.map(Self.stateForAge).sink { [weak self] in self?.ageState = $0 }.store(in: bag)
-        $phone.map(Self.stateForPhone).sink { [weak self] in self?.phoneState = $0 }.store(in: bag)
-        $email.map(Self.stateForEmail).sink { [weak self] in self?.emailState = $0 }.store(in: bag)
+        $name.map(stateForName).sink { [weak self] in self?.nameState = $0 }.store(in: bag)
+        $lastName.map(stateForLastName).sink { [weak self] in self?.lastNameState = $0 }.store(in: bag)
+        $age.map(stateForAge).sink { [weak self] in self?.ageState = $0 }.store(in: bag)
+        $phone.map(stateForPhone).sink { [weak self] in self?.phoneState = $0 }.store(in: bag)
+        $email.map(stateForEmail).sink { [weak self] in self?.emailState = $0 }.store(in: bag)
 
         Publishers.CombineLatest($documentNumber, $documentType)
-            .map(Self.stateForDocument)
+            .map(stateForDocument)
             .sink { [weak self] in self?.documentNumberState = $0 }
             .store(in: bag)
 
@@ -64,45 +60,48 @@ public final class RegisterViewModel: ObservableObject {
     }
 
     // MARK: - Intents
-    public func signUp() {
-        // Keep for future: persistence/analytics. Navigation is triggered by the View.
+    public func signUp() {}
+}
+
+// MARK: - Validation Helpers Ext.
+extension RegisterViewModel {
+
+    private func stateForName(_ raw: String) -> FieldState {
+        let trimmedStr = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedStr.isEmpty else { return .idle }
+        return RegisterValidation.validateName(trimmedStr) ? .valid : .invalid(message: "Enter at least 2 characters.")
     }
 
-    // MARK: - Helpers
-    private static func stateForName(_ raw: String) -> FieldState {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty else { return .idle }
-        return RegisterValidation.validateName(s) ? .valid : .invalid(message: "Enter at least 2 characters.")
+    private func stateForLastName(_ raw: String) -> FieldState {
+        let trimmedStr = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedStr.isEmpty else { return .idle }
+        return RegisterValidation.validateLastName(trimmedStr)
+            ? .valid : .invalid(message: "Enter at least 2 characters.")
     }
 
-    private static func stateForLastName(_ raw: String) -> FieldState {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty else { return .idle }
-        return RegisterValidation.validateLastName(s) ? .valid : .invalid(message: "Enter at least 2 characters.")
+    private func stateForAge(_ raw: String) -> FieldState {
+        let trimmedStr = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedStr.isEmpty else { return .idle }
+        return RegisterValidation.validateAge(trimmedStr) ? .valid : .invalid(message: "Age must be over 18.")
     }
 
-    private static func stateForAge(_ raw: String) -> FieldState {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty else { return .idle }
-        return RegisterValidation.validateAge(s) ? .valid : .invalid(message: "Age must be over 18.")
+    private func stateForPhone(_ raw: String) -> FieldState {
+        let trimmedStr = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedStr.isEmpty else { return .idle }
+        return RegisterValidation.validatePhone8Digits(trimmedStr)
+            ? .valid : .invalid(message: "Phone must be 8 digits.")
     }
 
-    private static func stateForPhone(_ raw: String) -> FieldState {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty else { return .idle }
-        return RegisterValidation.validatePhone8Digits(s) ? .valid : .invalid(message: "Phone must be 8 digits.")
+    private func stateForEmail(_ raw: String) -> FieldState {
+        let trimmedStr = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedStr.isEmpty else { return .idle }
+        return RegisterValidation.validateEmailBasic(trimmedStr) ? .valid : .invalid(message: "Enter a valid email.")
     }
 
-    private static func stateForEmail(_ raw: String) -> FieldState {
-        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty else { return .idle }
-        return RegisterValidation.validateEmailBasic(s) ? .valid : .invalid(message: "Enter a valid email.")
-    }
-
-    private static func stateForDocument(number: String, type: DocumentType) -> FieldState {
-        let s = number.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty else { return .idle }
-        let ok = RegisterValidation.validateDocNumber(s, for: type)
+    private func stateForDocument(number: String, type: DocumentType) -> FieldState {
+        let trimmedStr = number.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedStr.isEmpty else { return .idle }
+        let ok = RegisterValidation.validateDocNumber(trimmedStr, for: type)
         if ok { return .valid }
         switch type {
         case .id: return .invalid(message: "ID must be exactly 8 digits.")

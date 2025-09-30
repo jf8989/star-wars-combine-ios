@@ -5,11 +5,11 @@ import SwiftUI
 struct PlanetsView: View {
 
     @StateObject private var planetsVM: PlanetsViewModel = {
-        let http = URLSessionHTTPClient()
-        let real = PlanetsServiceLive(http: http)  // network
-        let service = LocalSearchPlanetsService(base: real, backfillAll: false)
-        // backfillAll: false → honors single-call policy; no background page walking
-        return PlanetsViewModel(service: service)
+        let httpClient = URLSessionHTTPClient()
+        let liveService = PlanetsServiceLive(http: httpClient)
+        let decoratedService = PlanetsSearchDecorator(base: liveService)
+
+        return PlanetsViewModel(service: decoratedService)
     }()
 
     var body: some View {

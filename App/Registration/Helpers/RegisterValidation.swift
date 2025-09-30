@@ -8,8 +8,6 @@ public enum DocumentType: String, CaseIterable {
     case passport
 }
 
-/// Pure validators for the Register screen. No UI, no Combine, no side effects.
-/// VM maps these to FieldState and error messages.
 public enum RegisterValidation {
 
     /// Non-empty name with at least 2 non-space characters.
@@ -24,11 +22,11 @@ public enum RegisterValidation {
         return trimmed.count >= 2
     }
 
-    /// Age must be an integer in [18, 120].
+    /// Age must be an integer in [19, 100].
     public static func validateAge(_ raw: String) -> Bool {
-        guard let age = Int(raw.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard let parsedAge = Int(raw.trimmingCharacters(in: .whitespacesAndNewlines))
         else { return false }
-        return (19...100).contains(age)  // older than 18
+        return (19...100).contains(parsedAge)  // older than 18
     }
 
     /// Exactly 8 digits (no spaces, no symbols).
@@ -38,35 +36,34 @@ public enum RegisterValidation {
         return digits.allSatisfy(\.isNumber)
     }
 
-    /// Basic email rule: something@something.tld (TLD length >= 2). Intentionally simple.
+    /// Basic email rule: something@something.tld (single-segment TLD, 2–24 letters).
+    /// No consecutive dots; `.com` must be exactly "com" (rejects ".commm…").
     public static func validateEmailBasic(_ raw: String) -> Bool {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        // Quick-and-clean regex, not exhaustive (by design for the assignment).
-        let pattern = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
-        return
-            (try? NSRegularExpression(
-                pattern: pattern,
-                options: [.caseInsensitive]
-            ))?
-            .firstMatch(
-                in: trimmed,
-                range: NSRange(location: 0, length: trimmed.utf16.count)
-            ) != nil
+
+        // Cheap pre-check: forbid consecutive dots in local or domain parts.
+        guard trimmed.contains("..") == false else { return false }
+
+        // Quick-and-clean regex, still intentionally basic.
+        // - Negative lookahead after the final dot prevents ".commm…"
+        // - Single TLD segment only (by design for the assignment)
+        let pattern = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.(?!com[A-Z])[A-Z]{2,24}$"#
+
+        return (try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]))?
+            .firstMatch(in: trimmed, range: NSRange(location: 0, length: trimmed.utf16.count)) != nil
     }
 
     /// Document number:
     /// - id: exactly 8 digits
     /// - passport: Exactly 9 chars, first must be a letter, remaining are letters or digits
-    public static func validateDocNumber(_ raw: String, for type: DocumentType)
-        -> Bool
-    {
+    public static func validateDocNumber(_ raw: String, for type: DocumentType) -> Bool {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         switch type {
         case .id:
             return trimmed.count == 8 && trimmed.allSatisfy(\.isNumber)
         case .passport:
             guard trimmed.count == 9 else { return false }
-            guard let first = trimmed.first, first.isLetter else {
+            guard let firstCharacter = trimmed.first, firstCharacter.isLetter else {
                 return false
             }
             return trimmed.dropFirst().unicodeScalars.allSatisfy {

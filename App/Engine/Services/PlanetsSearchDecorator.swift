@@ -1,41 +1,39 @@
-// App/Engine/Services/LocalSearchPlanetsService.swift
+// Path: App/Engine/Services/PlanetsSearchDecorator.swift
+// Role: Decorator that simulates API search using a local index and Combine
 
 import Combine
 import Foundation
 
-/// Decorator over a real PlanetsService that:
-/// - Passes through network fetches
-/// - Builds an in-memory index of all seen planets (session-only)
-/// - Implements `searchPlanets` by filtering that index,
-///   while optionally backfilling remaining pages in the background.
-///
-/// This preserves the "feels like the same API" contract: callers still use
-/// PlanetsService, and `searchPlanets` returns an AnyPublisher<PlanetsPage, AppError>.
-public final class LocalSearchPlanetsService: PlanetsService {
+public final class PlanetsSearchDecorator: PlanetsService {
     private let base: PlanetsService
-    private var fakeAPIlocalPlanetIndex: [Planet] = []
-    private var seenNames = Set<String>()  // simple de-dupe
-    private var nextURL: URL?  // last known next from pass-through pages
-    private var isBackfilling = false
-    private var cancellables = Set<AnyCancellable>()  // internal Combine bag
-    private let indexQueue = DispatchQueue(
-        label: "LocalSearch.Index",
-        qos: .userInitiated
-    )
 
-    /// Optional artificial latency to make search feel like a real API.
-    private let searchLatency: DispatchQueue.SchedulerTimeType.Stride =
-        .milliseconds(120)
+    // Session-only index and simple de-duplication by planet name
+    private var indexedPlanets: [Planet] = []
+    private var seenPlanetNames = Set<String>()
 
-    private let backfillAll: Bool
+    // Coordination for index access
+    private let indexQueue: DispatchQueue
 
-    public init(base: PlanetsService, backfillAll: Bool = false) {
+    // Simulation controls
+    private let scheduler: DispatchQueue
+    private let latency: DispatchQueue.SchedulerTimeType.Stride
+
+    // One-shot failure injection for tests
+    private var nextSearchFailure: AppError?
+
+    public init(
+        base: PlanetsService,
+        scheduler: DispatchQueue = .main,
+        latency: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(120),
+        indexQueue: DispatchQueue = DispatchQueue(label: "PlanetsSearch.Index", qos: .userInitiated)
+    ) {
         self.base = base
-        self.backfillAll = backfillAll
+        self.scheduler = scheduler
+        self.latency = latency
+        self.indexQueue = indexQueue
     }
 
-    // MARK: - PlanetsService
-
+    // MARK: - PlanetsService (pass-through + ingest)
     public func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError> {
         base.fetchFirstPage()
             .handleEvents(receiveOutput: { [weak self] page in
@@ -52,18 +50,41 @@ public final class LocalSearchPlanetsService: PlanetsService {
             .eraseToAnyPublisher()
     }
 
-    public func searchPlanets(query: String) -> AnyPublisher<
-        PlanetsPage, AppError
-    > {
-        // Kick a background backfill if we know there are more pages.
-        triggerBackfillIfNeeded()
+    // MARK: - Simulated API search (local filter + publisher)
+    public func searchPlanets(query: String) -> AnyPublisher<PlanetsPage, AppError> {
+        // Test hook: force next search to fail, once
+        if let injectedError = nextSearchFailure {
+            nextSearchFailure = nil
+            return Fail(error: injectedError).eraseToAnyPublisher()
+        }
 
-        let result = filter(query)
-        // Wrap results to look like a network call.
-        return Just(PlanetsPage(next: nil, planets: result))
-            .delay(for: searchLatency, scheduler: DispatchQueue.main)
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let snapshot = snapshotIndex()
+
+        let filtered: [Planet]
+        if trimmedQuery.isEmpty {
+            filtered = snapshot
+        } else {
+            let compareOptions: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+            filtered = snapshot.filter { planet in
+                planet.name.range(of: trimmedQuery, options: compareOptions) != nil
+                    || planet.climate.range(of: trimmedQuery, options: compareOptions) != nil
+                    || planet.terrain.range(of: trimmedQuery, options: compareOptions) != nil
+            }
+        }
+
+        let page = PlanetsPage(next: nil, planets: filtered)
+
+        // Wrap in a publisher and delay to feel like network (set latency .zero in tests)
+        return Just(page)
+            .delay(for: latency, scheduler: scheduler)
             .setFailureType(to: AppError.self)
             .eraseToAnyPublisher()
+    }
+
+    // MARK: - Test utilities
+    public func setNextSearchFailure(_ error: AppError) {
+        nextSearchFailure = error
     }
 
     // MARK: - Indexing
@@ -71,66 +92,19 @@ public final class LocalSearchPlanetsService: PlanetsService {
     private func ingest(_ page: PlanetsPage) {
         indexQueue.async { [weak self] in
             guard let self else { return }
-            for planet in page.planets where self.seenNames.insert(planet.name).inserted {
-                self.fakeAPIlocalPlanetIndex.append(planet)
+            for planet in page.planets {
+                if self.seenPlanetNames.insert(planet.name).inserted {
+                    self.indexedPlanets.append(planet)
+                }
             }
-            self.nextURL = page.next
-        }
-    }
-
-    private func filter(_ query: String) -> [Planet] {
-        let searchTerm = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !searchTerm.isEmpty else { return snapshotIndex() }
-        let compareOptions: String.CompareOptions = [
-            .caseInsensitive, .diacriticInsensitive,
-        ]
-        return snapshotIndex().filter { planet in
-            planet.name.range(of: searchTerm, options: compareOptions) != nil
-                || planet.climate.range(of: searchTerm, options: compareOptions) != nil
-                || planet.terrain.range(of: searchTerm, options: compareOptions) != nil
         }
     }
 
     private func snapshotIndex() -> [Planet] {
         var snapshot: [Planet] = []
-        indexQueue.sync { snapshot = self.fakeAPIlocalPlanetIndex }
-        return snapshot
-    }
-
-    // MARK: - Background backfill (memory-only; no persistence)
-
-    private func triggerBackfillIfNeeded() {
-        guard backfillAll else { return }  // honor single-call policy
-        indexQueue.async { [weak self] in
-            guard let self, !self.isBackfilling, let url = self.nextURL else {
-                return
-            }
-            self.isBackfilling = true
-            self.walk(from: url)
+        indexQueue.sync {
+            snapshot = self.indexedPlanets
         }
-    }
-
-    private func walk(from url: URL) {
-        base.fetchPage(at: url)
-            .receive(on: indexQueue)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    guard let self else { return }
-                    if case .failure = completion {
-                        // Stop backfill on error; future searches can retry trigger.
-                        self.isBackfilling = false
-                    }
-                },
-                receiveValue: { [weak self] page in
-                    guard let self else { return }
-                    self.ingest(page)
-                    if let next = page.next {
-                        self.walk(from: next)
-                    } else {
-                        self.isBackfilling = false
-                    }
-                }
-            )
-            .store(in: &cancellables)
+        return snapshot
     }
 }

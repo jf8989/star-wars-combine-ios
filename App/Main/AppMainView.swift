@@ -1,41 +1,32 @@
-// App/Main/AppMainView.swift
+// Path: App/Main/AppMainView.swift
+// Role: Root view, binds NavigationStack to Router and maps destinations
 
 import SwiftUI
 
 struct AppMainView: View {
-    @State private var path: [Route] = []
-
-    // ViewModels (persist for session)
-    @StateObject private var registerVM = RegisterViewModel()
-    @StateObject private var planetsVM: PlanetsViewModel = {
-        let http = URLSessionHTTPClient()
-        let real = PlanetsServiceLive(http: http)  // network
-        let service = LocalSearchPlanetsService(base: real, backfillAll: false)
-        // backfillAll: false → honors single-call policy; no background page walking
-        return PlanetsViewModel(service: service)
-    }()
+    @StateObject private var router = Router()
 
     var body: some View {
-        NavigationStack(path: $path) {
-            RegisterView(vm: registerVM)
-                .onChange(of: registerVM.shouldNavigateToPlanets) { _, should in
-                    if should {
-                        path.append(.planets)
-                        registerVM.shouldNavigateToPlanets = false
-                    }
-                }
-                .navigationDestination(for: Route.self) { route in
+        NavigationStack(path: $router.path) {
+
+            // Entry screen: Register
+            RegisterView()
+                .navigationDestination(for: AppRoutes.self) { route in
                     switch route {
+
                     case .register:
-                        RegisterView(vm: registerVM)
+                        RegisterView()
+
                     case .planets:
-                        PlanetsView(vm: planetsVM)
+                        PlanetsView()
                     }
                 }
         }
+        .environmentObject(router)
     }
 }
 
 #Preview("App") {
     AppMainView()
+        .environmentObject(Router())
 }

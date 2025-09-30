@@ -1,4 +1,5 @@
-// App/Shared/Route.swift
+// Path: App/Shared/Route.swift
+// Role: App routes (typed, hashable) for value-driven navigation
 
 import Foundation
 

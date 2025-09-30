@@ -5,63 +5,63 @@ import SwiftUI
 /// Real Register screen: 6 inputs, per-state underline colors, inline error on invalid,
 /// proper keyboards/content types, and Sign Up enabled only when form is valid.
 struct RegisterView: View {
-    @ObservedObject var vm: RegisterViewModel
+    @EnvironmentObject private var router: Router
+    @StateObject var registerVM: RegisterViewModel = RegisterViewModel()
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 UnderlinedFieldView(
                     title: "Name",
-                    text: $vm.name,
-                    state: vm.nameState,
+                    text: $registerVM.name,
+                    state: registerVM.nameState,
                     contentType: .givenName,
                     keyboard: .default,
                     autocap: .words
                 )
-
                 UnderlinedFieldView(
                     title: "Last name",
-                    text: $vm.lastName,
-                    state: vm.lastNameState,
+                    text: $registerVM.lastName,
+                    state: registerVM.lastNameState,
                     contentType: .familyName,
                     keyboard: .default,
                     autocap: .words
                 )
-
                 UnderlinedFieldView(
                     title: "Age",
-                    text: $vm.age,
-                    state: vm.ageState,
+                    text: $registerVM.age,
+                    state: registerVM.ageState,
                     contentType: nil,
                     keyboard: .numberPad,
                     autocap: .never
                 )
-
                 UnderlinedFieldView(
                     title: "Phone (8 digits)",
-                    text: $vm.phone,
-                    state: vm.phoneState,
+                    text: $registerVM.phone,
+                    state: registerVM.phoneState,
                     contentType: .telephoneNumber,
                     keyboard: .numberPad,
                     autocap: .never
                 )
-
                 UnderlinedFieldView(
                     title: "Email",
-                    text: $vm.email,
-                    state: vm.emailState,
+                    text: $registerVM.email,
+                    state: registerVM.emailState,
                     contentType: .emailAddress,
                     keyboard: .emailAddress,
                     autocap: .never
                 )
 
-                DocumentSectionView(vm: vm)
+                DocumentSectionView(vm: registerVM)
 
                 PrimaryButtonView(
                     title: "Sign Up → Planets",
-                    isEnabled: vm.isFormValid
+                    isEnabled: registerVM.isFormValid
                 ) {
-                    vm.signUp()
+                    registerVM.signUp()
+                    if registerVM.isFormValid {
+                        router.push(.planets)
+                    }
                 }
                 .padding(.top, 6)
             }
@@ -73,5 +73,6 @@ struct RegisterView: View {
 }
 
 #Preview("Register") {
-    RegisterView(vm: RegisterViewModel())
+    RegisterView(registerVM: RegisterViewModel())
+        .environmentObject(Router())
 }

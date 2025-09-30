@@ -2,17 +2,21 @@
 
 import SwiftUI
 
-/// Thin wrapper. Body only composes subviews per mandate.
 struct PlanetsView: View {
-    @ObservedObject var vm: PlanetsViewModel
+
+    @StateObject private var planetsVM: PlanetsViewModel = {
+        let http = URLSessionHTTPClient()
+        let real = PlanetsServiceLive(http: http)  // network
+        let service = LocalSearchPlanetsService(base: real, backfillAll: false)
+        // backfillAll: false → honors single-call policy; no background page walking
+        return PlanetsViewModel(service: service)
+    }()
+
     var body: some View {
-        PlanetsScreenView(viewModel: vm)
+        PlanetsScreenView(viewModel: planetsVM)
     }
 }
 
 #Preview("Planets") {
-    let http = URLSessionHTTPClient()
-    let svc = PlanetsServiceLive(http: http)
-    PlanetsView(vm: PlanetsViewModel(service: svc))
+    PlanetsView()
 }
- 

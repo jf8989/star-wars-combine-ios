@@ -3,7 +3,7 @@
 import Foundation
 
 /// App routes (value-based navigation).
-enum Route: Hashable {
+enum AppRoutes: Hashable {
     case register
     case planets
 }

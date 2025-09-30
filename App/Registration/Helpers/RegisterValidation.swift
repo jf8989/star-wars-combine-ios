@@ -22,11 +22,11 @@ public enum RegisterValidation {
         return trimmed.count >= 2
     }
 
-    /// Age must be an integer in [19, 100].
+    /// Age must be an integer in [18, 100].
     public static func validateAge(_ raw: String) -> Bool {
         guard let parsedAge = Int(raw.trimmingCharacters(in: .whitespacesAndNewlines))
         else { return false }
-        return (19...100).contains(parsedAge)  // older than 18
+        return (18...100).contains(parsedAge)  // 18 or older
     }
 
     /// Exactly 8 digits (no spaces, no symbols).

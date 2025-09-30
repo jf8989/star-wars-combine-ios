@@ -26,7 +26,7 @@ public final class RegisterViewModel: ObservableObject {
 
     private let bag = TaskBag()
 
-    public init() {
+    init() {
         // Per-field states
         $name.map(stateForName).sink { [weak self] in self?.nameState = $0 }.store(in: bag)
         $lastName.map(stateForLastName).sink { [weak self] in self?.lastNameState = $0 }.store(in: bag)
@@ -82,7 +82,7 @@ extension RegisterViewModel {
     private func stateForAge(_ raw: String) -> FieldState {
         let trimmedStr = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedStr.isEmpty else { return .idle }
-        return RegisterValidation.validateAge(trimmedStr) ? .valid : .invalid(message: "Age must be over 18.")
+        return RegisterValidation.validateAge(trimmedStr) ? .valid : .invalid(message: "Age must be 18 or older.")
     }
 
     private func stateForPhone(_ raw: String) -> FieldState {

@@ -4,6 +4,7 @@ import Combine
 import Foundation
 
 public final class RegisterViewModel: ObservableObject {
+
     // Inputs
     @Published var name: String = ""
     @Published var lastName: String = ""

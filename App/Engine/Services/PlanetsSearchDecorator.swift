@@ -21,7 +21,7 @@ public final class PlanetsSearchDecorator: PlanetsService {
     // One-shot failure injection for tests
     private var nextSearchFailure: AppError?
 
-    public init(
+    init(
         base: PlanetsService,
         scheduler: DispatchQueue = .main,
         latency: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(120),
@@ -34,7 +34,7 @@ public final class PlanetsSearchDecorator: PlanetsService {
     }
 
     // MARK: - PlanetsService (pass-through + ingest)
-    public func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError> {
+    func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError> {
         base.fetchFirstPage()
             .handleEvents(receiveOutput: { [weak self] page in
                 self?.ingest(page)
@@ -42,7 +42,7 @@ public final class PlanetsSearchDecorator: PlanetsService {
             .eraseToAnyPublisher()
     }
 
-    public func fetchPage(at url: URL) -> AnyPublisher<PlanetsPage, AppError> {
+    func fetchPage(at url: URL) -> AnyPublisher<PlanetsPage, AppError> {
         base.fetchPage(at: url)
             .handleEvents(receiveOutput: { [weak self] page in
                 self?.ingest(page)
@@ -51,7 +51,7 @@ public final class PlanetsSearchDecorator: PlanetsService {
     }
 
     // MARK: - Simulated API search (local filter + publisher)
-    public func searchPlanets(query: String) -> AnyPublisher<PlanetsPage, AppError> {
+    func searchPlanets(query: String) -> AnyPublisher<PlanetsPage, AppError> {
         // Test hook: force next search to fail, once
         if let injectedError = nextSearchFailure {
             nextSearchFailure = nil

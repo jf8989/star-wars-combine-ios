@@ -18,16 +18,16 @@ public final class PlanetsServiceLive: PlanetsService {
         self.decoder = decoder
     }
 
-    public func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError> {
+    func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError> {
         let url = makeURL(path: "/planets/")
         return pagePublisher(for: url)
     }
 
-    public func fetchPage(at url: URL) -> AnyPublisher<PlanetsPage, AppError> {
+    func fetchPage(at url: URL) -> AnyPublisher<PlanetsPage, AppError> {
         pagePublisher(for: url)
     }
 
-    public func searchPlanets(query: String) -> AnyPublisher<
+    func searchPlanets(query: String) -> AnyPublisher<
         PlanetsPage, AppError
     > {
         let url = makeURL(

@@ -4,13 +4,13 @@ import Combine
 import Foundation
 
 // MARK: - Domain response returned by the service
-public struct PlanetsPage {
+struct PlanetsPage {
     public let next: URL?
     public let planets: [Planet]
 }
 
 // MARK: - Service Protocol
-public protocol PlanetsService {
+protocol PlanetsService {
     func fetchFirstPage() -> AnyPublisher<PlanetsPage, AppError>
     func fetchPage(at url: URL) -> AnyPublisher<PlanetsPage, AppError>
     func searchPlanets(query: String) -> AnyPublisher<PlanetsPage, AppError>

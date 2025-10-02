@@ -3,10 +3,8 @@
 import SwiftUI
 import UIKit
 
-/// Underlined text field that adapts to FieldState and Light/Dark mode.
-/// - `autocap` controls capitalization per field (default .words).
-/// - Blue underline while typing is driven by focus (view concern).
 struct UnderlinedFieldView: View {
+
     let title: String
     @Binding var text: String
     let state: FieldState
@@ -34,14 +32,14 @@ struct UnderlinedFieldView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
+
             TextField(title, text: $text)
                 .textInputAutocapitalization(autocap)
                 .textContentType(contentType)
                 .keyboardType(keyboard)
                 .autocorrectionDisabled()
                 .focused($isFocused)
-                // Force a fresh UITextField when keyboard type changes
-                .id(keyboard.rawValue)
+                .id(keyboard.rawValue)  // Force a fresh UITextField when keyboard type changes
                 .padding(.vertical, 8)
                 .overlay(alignment: .bottom) {
                     Rectangle()

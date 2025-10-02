@@ -3,12 +3,7 @@
 import Combine
 import Foundation
 
-/// ViewModel for the Planets screen.
-/// - Page-turn UX via PlanetsPager (client-side slicing), also works with server `next`
-/// - Loading + alert mapping
-/// - Debounced search (service-backed) that preserves paging slice on clear
-@MainActor
-public final class PlanetsViewModel: ObservableObject {
+final class PlanetsViewModel: ObservableObject {
     // MARK: - Published UI state
     @Published private(set) var displayPlanets: [Planet] = []
     @Published private(set) var isLoading: Bool = false
@@ -38,18 +33,18 @@ public final class PlanetsViewModel: ObservableObject {
 
     // MARK: - Derived UI props
     /// True only when the API exposes a `next` URL (open-ended set).
-    public var hasServerPaging: Bool { nextURL != nil }
+    var hasServerPaging: Bool { nextURL != nil }
 
     /// Prev/Next availability
-    public var canLoadMore: Bool {
+    var canLoadMore: Bool {
         guard mode == .browsing, !isLoading else { return false }
         if hasServerPaging { return true }
         return pager.hasNext(totalCount: browsingPlanets.count)
     }
 
-    public var currentPageDisplay: Int { currentPage + 1 }
+    var currentPageDisplay: Int { currentPage + 1 }
 
-    public var totalPagesDisplay: String {
+    var totalPagesDisplay: String {
         if hasServerPaging {
             // Unknown until server no longer reports `next`
             return "?"
@@ -58,14 +53,24 @@ public final class PlanetsViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Debounce latency
+    private let debounceInterval: DispatchQueue.SchedulerTimeType.Stride
+    private let debounceScheduler: DispatchQueue
+
     // MARK: - Init
-    public init(service: PlanetsService) {
+    init(
+        service: PlanetsService,
+        debounceInterval: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(300),
+        debounceScheduler: DispatchQueue = .main
+    ) {
         self.service = service
+        self.debounceInterval = debounceInterval
+        self.debounceScheduler = debounceScheduler
         bindSearchPipeline()
     }
 
     // MARK: - Intents (Browsing)
-    public func loadFirstPage() {
+    func loadFirstPage() {
         guard mode == .browsing, !isLoading else { return }
         isLoading = true
         pagingCancellable?.cancel()
@@ -89,7 +94,7 @@ public final class PlanetsViewModel: ObservableObject {
             )
     }
 
-    public func goNextPage() {
+    func goNextPage() {
         guard mode == .browsing else { return }
         pageDirection = .forward
 
@@ -125,7 +130,7 @@ public final class PlanetsViewModel: ObservableObject {
             )
     }
 
-    public func goPrevPage() {
+    func goPrevPage() {
         guard mode == .browsing else { return }
         pageDirection = .backward
         if pager.stepBackward() {
@@ -137,7 +142,7 @@ public final class PlanetsViewModel: ObservableObject {
     // MARK: - Search (Extra Credit)
     private func bindSearchPipeline() {
         $searchTerm
-            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+            .debounce(for: debounceInterval, scheduler: debounceScheduler)
             .removeDuplicates()
             .sink { [weak self] term in
                 self?.performSearch(term)

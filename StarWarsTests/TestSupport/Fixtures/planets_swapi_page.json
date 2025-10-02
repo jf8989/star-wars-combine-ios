@@ -1,0 +1,23 @@
+{
+    "count": 61,
+    "next": "https://swapi.dev/api/planets/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "name": "Alderaan",
+            "climate": "temperate",
+            "gravity": "1 standard",
+            "terrain": "grasslands, mountains",
+            "diameter": "12500",
+            "population": "2000000000"
+        },
+        {
+            "name": "Tatooine",
+            "climate": "arid",
+            "gravity": "1 standard",
+            "terrain": "desert",
+            "diameter": "10465",
+            "population": "200000"
+        }
+    ]
+}

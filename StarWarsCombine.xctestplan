@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "FF21ACA5-47C2-4ED8-B534-F9885D599625",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:StarWarsCombine.xcodeproj",
+      "identifier" : "74AC70A02E60C5A100741F69",
+      "name" : "StarWarsCombine"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:StarWarsCombine.xcodeproj",
+        "identifier" : "749FC7CE2E8DBF20003A7612",
+        "name" : "StarWarsTests"
+      }
+    }
+  ],
+  "version" : 1
+}

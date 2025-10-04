@@ -1,4 +1,4 @@
-// App/Planets/UIState/PlanetsPager.swift
+// StarWarsCombine/Module/Screens/PlanetsScreens/UIState/PlanetsPager.swift
 
 import Foundation
 

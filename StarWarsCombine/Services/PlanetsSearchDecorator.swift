@@ -1,4 +1,4 @@
-// Path: App/Engine/Services/PlanetsSearchDecorator.swift
+// Path: StarWarsCombine/Services/PlanetsSearchDecorator.swift
 // Role: Decorator that simulates API search using a local index and Combine
 
 import Combine

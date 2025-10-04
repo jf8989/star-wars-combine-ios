@@ -1,4 +1,4 @@
-// App/Planets/PlanetsViewModel.swift
+// StarWarsCombine/Module/Screens/PlanetsScreen/PlanetsViewModel.swift
 
 import Combine
 import Foundation

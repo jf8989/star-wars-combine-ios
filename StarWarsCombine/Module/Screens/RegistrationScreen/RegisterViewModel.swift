@@ -1,4 +1,4 @@
-// App/Registration/RegisterViewModel.swift
+// StarWarsCombine/Module/Screens/RegistrationScreen/RegisterViewModel.swift
 
 import Combine
 import Foundation

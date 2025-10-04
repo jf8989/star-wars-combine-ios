@@ -1,4 +1,4 @@
-// App/Navigation/Router.swift
+// StarWarsCombine/Resources/Navigation/Router.swift
 // Role Environment-scoped navigation source of truth (push/pop/reset)
 
 import SwiftUI

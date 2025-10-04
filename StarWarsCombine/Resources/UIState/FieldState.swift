@@ -1,4 +1,4 @@
-// App/Shared/UIState/FieldState.swift
+// StarWarsCombine/Resources/UIState/FieldState.swift
 
 import Foundation
 

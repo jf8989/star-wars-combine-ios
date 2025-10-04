@@ -1,4 +1,4 @@
-// App/Planets/Components/PlanetsSearchBar.swift
+// StarWarsCombine/Module/Screens/PlanetsScreen/Components/PlanetsSearchBar.swift
 
 import SwiftUI
 

@@ -1,4 +1,4 @@
-// App/Model/AppError.swift
+// StarWarsCombine/Model/AppError.swift
 
 import Foundation
 

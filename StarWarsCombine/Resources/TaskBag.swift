@@ -1,4 +1,4 @@
-// App/Shared/TaskBag.swift
+// StarWarsCombine/Resources/TaskBag.swift
 
 import Combine
 import Foundation

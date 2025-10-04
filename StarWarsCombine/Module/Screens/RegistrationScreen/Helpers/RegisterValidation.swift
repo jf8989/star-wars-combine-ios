@@ -1,4 +1,4 @@
-// App/Registration/Helpers/RegisterValidation.swift
+// StarWarsCombine/Module/Screens/RegistrationScreen/Helpers/RegisterValidation.swift
 
 import Foundation
 

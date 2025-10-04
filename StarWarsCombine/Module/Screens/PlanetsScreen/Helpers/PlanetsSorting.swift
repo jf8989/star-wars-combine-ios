@@ -1,4 +1,4 @@
-// App/Planets/Helpers/PlanetsSorting.swift
+// StarWarsCombine/Module/Screens/PlanetsScreen/Helpers/PlanetsSorting.swift
 
 import Foundation
 

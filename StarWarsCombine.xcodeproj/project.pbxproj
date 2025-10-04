@@ -18,7 +18,6 @@
 
 /* Begin PBXFileReference section */
 		749FC7CF2E8DBF20003A7612 /* StarWarsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StarWarsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		749FC8102E8DE163003A7612 /* StarWarsCombine.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StarWarsCombine.xctestplan; sourceTree = "<group>"; };
 		74FCA9702E63AD8400165A40 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsCombine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -28,9 +27,9 @@
 			path = StarWarsTests;
 			sourceTree = "<group>";
 		};
-		74AC70A32E60C5A100741F69 /* App */ = {
+		74AC70A32E60C5A100741F69 /* StarWarsCombine */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = App;
+			path = StarWarsCombine;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -56,8 +55,7 @@
 		74AC70982E60C5A100741F69 = {
 			isa = PBXGroup;
 			children = (
-				749FC8102E8DE163003A7612 /* StarWarsCombine.xctestplan */,
-				74AC70A32E60C5A100741F69 /* App */,
+				74AC70A32E60C5A100741F69 /* StarWarsCombine */,
 				74FCA9702E63AD8400165A40 /* StarWarsCombine.app */,
 				749FC7CF2E8DBF20003A7612 /* StarWarsTests.xctest */,
 				749FC7D02E8DBF20003A7612 /* StarWarsTests */,
@@ -103,7 +101,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				74AC70A32E60C5A100741F69 /* App */,
+				74AC70A32E60C5A100741F69 /* StarWarsCombine */,
 			);
 			name = StarWarsCombine;
 			packageProductDependencies = (

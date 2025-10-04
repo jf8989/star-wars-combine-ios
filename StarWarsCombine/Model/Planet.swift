@@ -1,4 +1,4 @@
-// App/Model/Planet.swift
+// StarWarsCombine/Model/Planet.swift
 
 import Foundation
 

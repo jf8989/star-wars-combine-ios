@@ -1,4 +1,4 @@
-// App/Planets/Components/Buttons.swift
+// StarWarsCombine/Module/Screens/PlanetsScreen/Components/Buttons.swift
 
 import SwiftUI
 

@@ -1,4 +1,4 @@
-// App/Registration/RegisterView.swift
+// StarWarsCombine/Module/Screens/RegistrationScreen/RegisterView.swift
 
 import SwiftUI
 

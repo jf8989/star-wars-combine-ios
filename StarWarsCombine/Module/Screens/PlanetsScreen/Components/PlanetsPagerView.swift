@@ -1,4 +1,4 @@
-// App/Planets/Components/PlanetsPagerView.swift
+// StarWarsCombine/Module/Screens/PlanetsScreen/Components/PlanetsPagerView.swift
 
 import SwiftUI
 

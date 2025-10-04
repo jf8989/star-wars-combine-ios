@@ -1,4 +1,4 @@
-// App/Registration/Components/UnderlinedField.swift
+// StarWarsCombine/Module/Screens/RegistrationScreen/Components/UnderlinedField.swift
 
 import SwiftUI
 import UIKit

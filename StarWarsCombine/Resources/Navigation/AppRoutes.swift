@@ -1,4 +1,4 @@
-// Path: App/Shared/Route.swift
+// Path: StarWarsCombine/Resources/Navigation/Route.swift
 // Role: App routes (typed, hashable) for value-driven navigation
 
 import Foundation

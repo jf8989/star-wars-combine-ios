@@ -1,4 +1,4 @@
-// Path: App/Main/AppMainView.swift
+// Path: StarWarsCombine/Module/Screens/MainScreen/AppMainView.swift
 // Role: Root view, binds NavigationStack to Router and maps destinations
 
 import SwiftUI

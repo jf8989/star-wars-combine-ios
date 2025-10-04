@@ -1,4 +1,4 @@
-// App/Planets/Components/PlanetCard.swift
+// StarWarsCombine/Module/Screens/PlanetsScreen/Components/PlanetCard.swift
 
 import SwiftUI
 

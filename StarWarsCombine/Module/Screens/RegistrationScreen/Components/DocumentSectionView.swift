@@ -1,4 +1,4 @@
-// App/Registration/Components/DocumentSection.swift
+// StarWarsCombine/Module/Screens/RegistrationScreen/Components/DocumentSection.swift
 
 import SwiftUI
 import UIKit

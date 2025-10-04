@@ -17,9 +17,9 @@ final class AppErrorTests: XCTestCase {
 
     func testUserMessage_Decode() {
         // Given a decode error
-        struct Dummy: Error {}
+        struct DummyError: Error {}
         // When we read its userMessage
-        let message = AppError.decode(Dummy()).userMessage
+        let message = AppError.decode(DummyError()).userMessage
         // Then it maps to the generic decode failure
         XCTAssertEqual(message, "We couldn't read the server response.")
     }

@@ -1,11 +1,13 @@
-// Path: StarWarsTests/PlanetsScreen/PlanetsPagerTests.swift
-// Role: Pure paging math tests — stabilized guards + boundary coverage
+/// Path: StarWarsTests/PlanetsScreen/PlanetsPagerTests.swift
+/// Role: Pure paging math tests — stabilized guards + boundary coverage
 
 import XCTest
 
 @testable import StarWarsCombine
 
 final class PlanetsPagerTests: XCTestCase {
+
+    // MARK: - Slicing
 
     func testSlice_EmptyInputReturnsEmpty() {
         // Given: empty collection with pageSize=3
@@ -28,17 +30,20 @@ final class PlanetsPagerTests: XCTestCase {
 
         // When: take first, advance, take middle, advance, take last
         let first = pager.slice(items)
-        _ = pager.stepForwardIfPossible(totalCount: items.count)
+        _ = pager.stepForwardIfPossible(totalCount: items.count)  // 0 → 1
         let middle = pager.slice(items)
-        _ = pager.stepForwardIfPossible(totalCount: items.count)
+        _ = pager.stepForwardIfPossible(totalCount: items.count)  // 1 → 2
         let last = pager.slice(items)
 
-        // Then: slices match expected windows; totalPages == 3
+        // Then: slices match expected windows; totalPages == 3; ended on page 2 (last)
         XCTAssertEqual(first, [1, 2, 3, 4])
         XCTAssertEqual(middle, [5, 6, 7, 8])
         XCTAssertEqual(last, [9, 10])
         XCTAssertEqual(pager.totalPages(totalCount: items.count), 3)
+        XCTAssertEqual(pager.currentPage, 2, "After two forward steps we should be on the last page (index 2)")
     }
+
+    // MARK: - Navigation (Forward)
 
     func testHasNextAndStepGuards() {
         // Given: 11 items with pageSize=5 → pages: [0–4], [5–9], [10]
@@ -50,20 +55,28 @@ final class PlanetsPagerTests: XCTestCase {
         XCTAssertEqual(pager.currentPage, 0)
         XCTAssertEqual(items.count, 11)
 
-        // When / Then: forward navigation respects bounds
+        // When / Then: forward navigation respects bounds and updates page index
         XCTAssertTrue(pager.hasNext(totalCount: items.count))  // page 0 → next exists
         XCTAssertTrue(pager.stepForwardIfPossible(totalCount: items.count))  // 0 → 1
+        XCTAssertEqual(pager.currentPage, 1, "After first step forward we should be on page 1")
+
         XCTAssertTrue(pager.hasNext(totalCount: items.count))  // page 1 → next exists
         XCTAssertTrue(pager.stepForwardIfPossible(totalCount: items.count))  // 1 → 2
+        XCTAssertEqual(pager.currentPage, 2, "After second step forward we should be on page 2 (last)")
+
         XCTAssertFalse(pager.hasNext(totalCount: items.count))  // page 2 is last
         XCTAssertFalse(pager.stepForwardIfPossible(totalCount: items.count))  // cannot advance
+        XCTAssertEqual(pager.currentPage, 2, "Index should not change when no next page exists")
     }
+
+    // MARK: - Navigation (Backward)
 
     func testStepBackwardRespectsLowerBound() {
         // Given: pageSize=3; after one forward step we are on page 1
         var pager = PlanetsPager(pageSize: 3)
         let items = Array(1...7)
         _ = pager.stepForwardIfPossible(totalCount: items.count)  // reach page 1
+        XCTAssertEqual(pager.currentPage, 1, "Precondition: we should be on page 1 before stepping back")
 
         // When: stepping backward twice
         XCTAssertTrue(pager.stepBackward())
@@ -72,6 +85,8 @@ final class PlanetsPagerTests: XCTestCase {
         XCTAssertEqual(pager.currentPage, 0)
         XCTAssertEqual(pager.slice(items), [1, 2, 3])
     }
+
+    // MARK: - Boundaries
 
     /// Documents the boundary behavior: when totalCount is an exact multiple of pageSize
     /// and we're at page 0 with default pageSize=10, hasNext is false for 10 items.
@@ -89,5 +104,6 @@ final class PlanetsPagerTests: XCTestCase {
             pager.stepForwardIfPossible(totalCount: items.count),
             "Cannot step forward because there is no next page"
         )
+        XCTAssertEqual(pager.currentPage, 0, "Index remains at 0 when no next page exists")
     }
 }

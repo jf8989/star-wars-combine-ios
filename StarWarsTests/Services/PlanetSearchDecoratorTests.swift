@@ -1,5 +1,5 @@
-// Path: StarWarsTests/Services/PlanetsSearchDecoratorTests.swift
-// Role: Local index ingest + search behavior (zero-latency, deterministic)
+/// Path: StarWarsTests/Services/PlanetsSearchDecoratorTests.swift
+/// Role: Local index ingest + search behavior (zero-latency, deterministic)
 
 import Combine
 import XCTest
@@ -7,7 +7,17 @@ import XCTest
 @testable import StarWarsCombine
 
 final class PlanetsSearchDecoratorTests: XCTestCase {
-    private var subscriptions = Set<AnyCancellable>()
+
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Lifecycle
+
+    override func tearDown() {
+        cancellables.removeAll()
+        super.tearDown()
+    }
+
+    // MARK: - Ingestion & Deduplication
 
     func testIngestsAndDeduplicates_OnFetches() {
         // Given: base stub returns two pages with a duplicate name; decorator ingests on fetches
@@ -65,7 +75,7 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
         baseService.firstPage = firstPage
         baseService.nextPage = secondPage
 
-        let expectationPagesIngested = expectation(description: "ingest pages")
+        let expectPagesIngested = expectation(description: "pages ingested")
         var receivedPlanets: [Planet] = []
 
         // When: fetch first, then fetch next; wait for index queue to drain
@@ -74,31 +84,33 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
             .sink(
                 receiveCompletion: { _ in
                     indexQueue.sync {}  // Then: ensure indexing finished before assertions
-                    expectationPagesIngested.fulfill()
+                    expectPagesIngested.fulfill()
                 },
                 receiveValue: { _ in }
             )
-            .store(in: &subscriptions)
+            .store(in: &cancellables)
 
-        wait(for: [expectationPagesIngested], timeout: 1.0)
+        wait(for: [expectPagesIngested], timeout: 1.0)
 
         // When: searching with empty string (return all)
-        let expectationSearchAll = expectation(description: "search all")
+        let expectSearchAll = expectation(description: "search all returns all items")
         decorator.searchPlanets(query: "")
             .sink(
                 receiveCompletion: { _ in },
                 receiveValue: { page in
                     receivedPlanets = page.planets
-                    expectationSearchAll.fulfill()
+                    expectSearchAll.fulfill()
                 }
             )
-            .store(in: &subscriptions)
+            .store(in: &cancellables)
 
-        wait(for: [expectationSearchAll], timeout: 1.0)
+        wait(for: [expectSearchAll], timeout: 1.0)
 
         // Then: 3 unique names, any order (decorator does not sort)
         XCTAssertEqual(Set(receivedPlanets.map(\.name)), Set(["Alderaan", "Tatooine", "Endor"]))
     }
+
+    // MARK: - Search Filtering (case/diacritic-insensitive)
 
     func testSearch_FiltersByNameClimateTerrain_CaseAndDiacriticInsensitive() {
         // Given: page containing names and fields with mixed case/diacritics; ingested into decorator
@@ -143,17 +155,17 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
         baseService.firstPage = page
 
         // When: ingesting first page (wait for indexing to finish)
-        let expectationIngest = expectation(description: "ingest")
+        let expectIngested = expectation(description: "index ingested")
         decorator.fetchFirstPage()
             .sink(
                 receiveCompletion: { _ in
                     indexQueue.sync {}
-                    expectationIngest.fulfill()
+                    expectIngested.fulfill()
                 },
                 receiveValue: { _ in }
             )
-            .store(in: &subscriptions)
-        wait(for: [expectationIngest], timeout: 1.0)
+            .store(in: &cancellables)
+        wait(for: [expectIngested], timeout: 1.0)
 
         // Then: queries match across name, climate, terrain; diacritics/case ignored
         assertSearch(decorator, query: "tat", expects: ["Tatooine"])
@@ -161,6 +173,8 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
         assertSearch(decorator, query: "tundra", expects: ["Hoth"])
         assertSearch(decorator, query: "", expects: ["Endor", "Hoth", "Tatooine"])
     }
+
+    // MARK: - One-shot Failure Hook
 
     func testOneShotFailureHook() {
         // Given: decorator configured to fail once, then succeed
@@ -170,20 +184,20 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
         // When: first search triggers injected failure
         decorator.setNextSearchFailure(.message("Boom"))
 
-        let expectationFirstFailure = expectation(description: "fails first time")
+        let expectFirstFailure = expectation(description: "fails first search")
         var firstError: AppError?
         decorator.searchPlanets(query: "anything")
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion { firstError = error }
-                    expectationFirstFailure.fulfill()
+                    expectFirstFailure.fulfill()
                 },
                 receiveValue: { _ in
                     XCTFail("Should not succeed on first search")
                 }
             )
-            .store(in: &subscriptions)
-        wait(for: [expectationFirstFailure], timeout: 1.0)
+            .store(in: &cancellables)
+        wait(for: [expectFirstFailure], timeout: 1.0)
 
         // Then: error is `.message("Boom")`; subsequent searches succeed (base default)
         guard case .message(let message)? = firstError else {
@@ -191,14 +205,43 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
         }
         XCTAssertEqual(message, "Boom")
 
-        let expectationSecondSuccess = expectation(description: "succeeds second time")
+        let expectSecondSuccess = expectation(description: "succeeds second search")
         decorator.searchPlanets(query: "anything")
             .sink(
-                receiveCompletion: { _ in expectationSecondSuccess.fulfill() },
+                receiveCompletion: { _ in expectSecondSuccess.fulfill() },
                 receiveValue: { _ in }
             )
-            .store(in: &subscriptions)
-        wait(for: [expectationSecondSuccess], timeout: 1.0)
+            .store(in: &cancellables)
+        wait(for: [expectSecondSuccess], timeout: 1.0)
+    }
+
+    // MARK: - Latency Simulation
+
+    func testLatencyHonored() {
+        // Given: decorator with 10ms artificial latency and a page to ingest
+        let baseService = StubPlanetsService()
+        baseService.firstPage = PlanetsPage(
+            next: nil,
+            planets: [Planet(name: "Dagobah", climate: "", gravity: "", terrain: "", diameter: "", population: "")]
+        )
+        let decorator = PlanetsSearchDecorator(base: baseService, scheduler: .main, latency: .milliseconds(10))
+
+        // When: fetch then search; measure elapsed time
+        let expectLatencyRespected = expectation(description: "latency respected")
+        let startTime = Date()
+        decorator.fetchFirstPage()
+            .flatMap { _ in decorator.searchPlanets(query: "") }
+            .sink(
+                receiveCompletion: { _ in },
+                receiveValue: { _ in
+                    let elapsed = Date().timeIntervalSince(startTime)
+                    // Then: elapsed time is ≥ configured latency
+                    XCTAssertGreaterThanOrEqual(elapsed, 0.01)
+                    expectLatencyRespected.fulfill()
+                }
+            )
+            .store(in: &cancellables)
+        wait(for: [expectLatencyRespected], timeout: 1.0)
     }
 
     // MARK: - Helpers
@@ -211,7 +254,7 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
         line: UInt = #line
     ) {
         // Given: a prepared decorator index; When: searchPlanets(query:) is called; Then: names match set-wise
-        let expectationSearch = expectation(description: "search \(query)")
+        let expectSearch = expectation(description: "search \(query)")
         var results: [Planet] = []
 
         decorator.searchPlanets(query: query)
@@ -219,40 +262,13 @@ final class PlanetsSearchDecoratorTests: XCTestCase {
                 receiveCompletion: { _ in },
                 receiveValue: { page in
                     results = page.planets
-                    expectationSearch.fulfill()
+                    expectSearch.fulfill()
                 }
             )
-            .store(in: &subscriptions)
+            .store(in: &cancellables)
 
-        wait(for: [expectationSearch], timeout: 1.0)
+        wait(for: [expectSearch], timeout: 1.0)
 
         XCTAssertEqual(Set(results.map(\.name)), Set(names), file: file, line: line)
-    }
-
-    func testLatencyHonored() {
-        // Given: decorator with 10ms artificial latency and a page to ingest
-        let baseService = StubPlanetsService()
-        baseService.firstPage = PlanetsPage(
-            next: nil,
-            planets: [Planet(name: "Dagobah", climate: "", gravity: "", terrain: "", diameter: "", population: "")]
-        )
-        let decorator = PlanetsSearchDecorator(base: baseService, scheduler: .main, latency: .milliseconds(10))
-
-        // When: fetch then search; measure elapsed time
-        let expectationLatencyRespected = expectation(description: "latency respected")
-        let startTime = Date()
-        decorator.fetchFirstPage()
-            .flatMap { _ in decorator.searchPlanets(query: "") }
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { _ in
-                    let elapsed = Date().timeIntervalSince(startTime)
-                    // Then: elapsed time is ≥ configured latency
-                    XCTAssertGreaterThanOrEqual(elapsed, 0.01)
-                    expectationLatencyRespected.fulfill()
-                }
-            )
-            .store(in: &subscriptions)
-        wait(for: [expectationLatencyRespected], timeout: 1.0)
     }
 }

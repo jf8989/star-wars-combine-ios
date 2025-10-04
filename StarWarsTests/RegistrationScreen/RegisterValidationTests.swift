@@ -7,7 +7,8 @@ import XCTest
 
 final class RegisterValidationTests: XCTestCase {
 
-    // Name / Last Name
+    // MARK: - Name / Last Name
+
     func testValidateName_TrimsAndRequiresTwoCharacters() {
         // Given: various name inputs including whitespace and short strings
         // When / Then: validateName enforces trim + min length of 2
@@ -25,7 +26,8 @@ final class RegisterValidationTests: XCTestCase {
         XCTAssertTrue(RegisterValidation.validateLastName(" Xu"))
     }
 
-    // Age
+    // MARK: - Age
+
     func testValidateAge_IsIntegerAndWithinRange() {
         // Given: age strings covering non-integer, boundary, and in-range cases
         // When / Then: validateAge requires integer 18...100 inclusive
@@ -37,7 +39,8 @@ final class RegisterValidationTests: XCTestCase {
         XCTAssertFalse(RegisterValidation.validateAge("101"))
     }
 
-    // Phone
+    // MARK: - Phone
+
     func testValidatePhone_ExactlyEightDigits() {
         // Given: phone inputs with wrong count, spaces, and non-digits
         // When / Then: validatePhone8Digits passes only exactly 8 digits
@@ -48,7 +51,8 @@ final class RegisterValidationTests: XCTestCase {
         XCTAssertTrue(RegisterValidation.validatePhone8Digits("12345678"))
     }
 
-    // Email
+    // MARK: - Email
+
     func testValidateEmail_BasicRules() {
         // Given: email strings with double dots, long TLD, invalid format, valid mixed-case
         // When / Then: validateEmailBasic rejects invalids, accepts valid addresses (case-insensitive)
@@ -59,8 +63,9 @@ final class RegisterValidationTests: XCTestCase {
         XCTAssertTrue(RegisterValidation.validateEmailBasic("UPPER@EXAMPLE.NET"))
     }
 
-    // Document
-    func testValidateDocNumber_ID_EightDigits() {
+    // MARK: - Document
+
+    func testValidateDocumentNumber_ID_EightDigits() {
         // Given: candidate ID numbers varying in length/characters
         // When / Then: validateDocNumber(.id) requires exactly 8 digits
         XCTAssertFalse(RegisterValidation.validateDocNumber("1234567", for: .id))
@@ -68,7 +73,7 @@ final class RegisterValidationTests: XCTestCase {
         XCTAssertTrue(RegisterValidation.validateDocNumber("12345678", for: .id))
     }
 
-    func testValidateDocNumber_Passport_FirstLetterThenEightAlnum() {
+    func testValidateDocumentNumber_Passport_FirstLetterThenEightAlnum() {
         // Given: passport numbers with wrong shapes and a valid one
         // When / Then: validateDocNumber(.passport) enforces 1 letter + 8 alphanumeric
         XCTAssertFalse(RegisterValidation.validateDocNumber("123456789", for: .passport))

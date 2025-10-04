@@ -1,4 +1,4 @@
-/// Path: StarWarsTestsPlanetsScreen/PlanetsSortingTests.swift
+/// Path: StarWarsTests/PlanetsScreen/PlanetsSortingTests.swift
 /// Role: Presentation sort policy tests
 
 import XCTest
@@ -6,6 +6,8 @@ import XCTest
 @testable import StarWarsCombine
 
 final class PlanetsSortingTests: XCTestCase {
+
+    // MARK: - Case/Diacritic-insensitive Alpha Sort
 
     func testAlphaSort_IsCaseAndDiacriticInsensitive() {
         // Given: an unsorted list with mixed case and diacritics
@@ -37,17 +39,13 @@ final class PlanetsSortingTests: XCTestCase {
         ]
 
         // When: applying presentation alpha sort
-        let sorted = PlanetsSorting.alpha(unsorted).map { $0.name }
+        let sortedNames = PlanetsSorting.alpha(unsorted).map(\.name)
 
-        // Then: order matches case/diacritic-insensitive compare (Alderaan, Endor, Tatooine)
-        XCTAssertEqual(
-            sorted,
-            ["Alderaan", "éndor", "tatooine"].sorted {
-                $0.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                    < $1.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-            }
-        )
+        // Then: order ignores case/diacritics (explicit oracle)
+        XCTAssertEqual(sortedNames, ["Alderaan", "éndor", "tatooine"])
     }
+
+    // MARK: - Stability
 
     func testAlphaSort_StableWithAlreadySortedInput() {
         // Given: already sorted input by name
@@ -61,6 +59,6 @@ final class PlanetsSortingTests: XCTestCase {
         let output = PlanetsSorting.alpha(sortedInput)
 
         // Then: order remains unchanged (stable for equal-keys)
-        XCTAssertEqual(output.map { $0.name }, ["Alderaan", "Bespin", "Crait"])
+        XCTAssertEqual(output.map(\.name), ["Alderaan", "Bespin", "Crait"])
     }
 }

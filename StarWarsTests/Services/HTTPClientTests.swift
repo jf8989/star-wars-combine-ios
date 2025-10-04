@@ -1,5 +1,5 @@
 /// Path: StarWarsTests/Services/HTTPClientTests.swift
-/// Role: Cover extension get(url:) forwards to headers version
+/// Role: Cover extension get(url:) forwards to headers version + URLSession client behaviors
 
 import Combine
 import XCTest
@@ -18,35 +18,35 @@ final class HTTPClientTests: XCTestCase {
     // MARK: - Extension forwarding
     func testGetWithoutHeadersForwardsToGetWithEmptyHeaders() {
         // Given: an HTTPClient spy that records whether headers are empty
-        class Spy: HTTPClient {
+        class HTTPClientSpy: HTTPClient {
             var calledWithEmptyHeaders = false
             func get(url: URL, headers: [String: String]) -> AnyPublisher<Data, URLError> {
                 calledWithEmptyHeaders = headers.isEmpty
                 return Just(Data()).setFailureType(to: URLError.self).eraseToAnyPublisher()
             }
         }
-        let spy = Spy()
+        let spyClient = HTTPClientSpy()
 
         // When: calling the convenience get(url:) without headers
-        _ = spy.get(url: URL(string: "https://example.com")!)
+        _ = spyClient.get(url: URL(string: "https://example.com")!)
 
         // Then: underlying method is invoked with empty headers
-        XCTAssertTrue(spy.calledWithEmptyHeaders)
+        XCTAssertTrue(spyClient.calledWithEmptyHeaders)
     }
 
     // MARK: - URLSessionHTTPClient: success + headers
     func testGetWithHeaders_AppliesHeaders_AndPublishesData() {
         // Given: URLSession configured with StubURLProtocol to succeed with expected payload
-        let config = URLSessionConfiguration.ephemeral
-        config.protocolClasses = [StubURLProtocol.self]
-        let expected = Data("payload".utf8)
-        StubURLProtocol.mode = .success(data: expected)
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubURLProtocol.self]
+        let expectedData = Data("payload".utf8)
+        StubURLProtocol.mode = .success(data: expectedData)
 
         // internal init is visible via @testable
-        let client = URLSessionHTTPClient(configuration: config)
+        let client = URLSessionHTTPClient(configuration: configuration)
 
         let expectationReceivedData = expectation(description: "receives data")
-        var received: Data?
+        var receivedData: Data?
 
         // When: performing GET with custom header
         client.get(
@@ -56,7 +56,7 @@ final class HTTPClientTests: XCTestCase {
         .sink(
             receiveCompletion: { _ in },
             receiveValue: { data in
-                received = data
+                receivedData = data
                 expectationReceivedData.fulfill()
             }
         )
@@ -65,28 +65,28 @@ final class HTTPClientTests: XCTestCase {
         wait(for: [expectationReceivedData], timeout: 1.0)
 
         // Then: data matches and header applied to captured request
-        XCTAssertEqual(received, expected)
-        let headers = StubURLProtocol.capturedRequests.first?.allHTTPHeaderFields
-        XCTAssertEqual(headers?["X-Custom"], "ABC")
+        XCTAssertEqual(receivedData, expectedData)
+        let allHeaders = StubURLProtocol.capturedRequests.first?.allHTTPHeaderFields
+        XCTAssertEqual(allHeaders?["X-Custom"], "ABC")
     }
 
     // MARK: - URLSessionHTTPClient: URLError propagation
     func testGetPublishesURLErrorOnFailure() {
         // Given: StubURLProtocol configured to fail with URLError(.timedOut)
-        let config = URLSessionConfiguration.ephemeral
-        config.protocolClasses = [StubURLProtocol.self]
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubURLProtocol.self]
         StubURLProtocol.mode = .failure(error: URLError(.timedOut))
 
-        let client = URLSessionHTTPClient(configuration: config)
+        let client = URLSessionHTTPClient(configuration: configuration)
 
         let expectationReceivedError = expectation(description: "receives error")
-        var received: URLError?
+        var receivedError: URLError?
 
         // When: performing GET that triggers network failure
         client.get(url: URL(string: "https://example.com/fail")!, headers: [:])
             .sink(
                 receiveCompletion: { completion in
-                    if case .failure(let e) = completion { received = e }
+                    if case .failure(let urlError) = completion { receivedError = urlError }
                     expectationReceivedError.fulfill()
                 },
                 receiveValue: { _ in XCTFail("should not succeed") }
@@ -96,47 +96,6 @@ final class HTTPClientTests: XCTestCase {
         wait(for: [expectationReceivedError], timeout: 1.0)
 
         // Then: published error is the expected URLError
-        XCTAssertEqual(received?.code, .timedOut)
+        XCTAssertEqual(receivedError?.code, .timedOut)
     }
-}
-
-// MARK: - URLProtocol stub for URLSession
-private final class StubURLProtocol: URLProtocol {
-    enum Mode {
-        case success(data: Data)
-        case failure(error: URLError)
-    }
-    static var mode: Mode = .success(data: Data())
-    static var capturedRequests: [URLRequest] = []
-
-    static func reset() {
-        mode = .success(data: Data())
-        capturedRequests = []
-    }
-
-    override class func canInit(with request: URLRequest) -> Bool { true }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
-
-    override func startLoading() {
-        // Given: request captured and mode configured
-        Self.capturedRequests.append(request)
-        switch Self.mode {
-        case .success(let data):
-            // When: succeeding with 200 + data
-            let response = HTTPURLResponse(
-                url: request.url!,
-                statusCode: 200,
-                httpVersion: nil,
-                headerFields: [:]
-            )!
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client?.urlProtocol(self, didLoad: data)
-            client?.urlProtocolDidFinishLoading(self)
-        case .failure(let error):
-            // Then: propagate configured URLError
-            client?.urlProtocol(self, didFailWithError: error)
-        }
-    }
-
-    override func stopLoading() {}
 }

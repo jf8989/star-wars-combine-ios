@@ -9,16 +9,21 @@ import XCTest
 final class RegisterViewModelTests: XCTestCase {
     private var cancellables: Set<AnyCancellable> = []
 
+    override func tearDown() {
+        cancellables.removeAll()
+        super.tearDown()
+    }
+
     func testAllFieldsValidMakesFormValid() {
         // Given a fresh RegisterViewModel
         let viewModel = RegisterViewModel()
 
         // And a subscriber waiting for the first 'true'
-        let expectation = expectation(description: "form valid")
+        let expectFormValidTrue = expectation(description: "form valid")
         viewModel.$isFormValid
             .filter { $0 }
             .prefix(1)
-            .sink { _ in expectation.fulfill() }
+            .sink { _ in expectFormValidTrue.fulfill() }
             .store(in: &cancellables)
 
         // When all inputs are valid
@@ -31,7 +36,7 @@ final class RegisterViewModelTests: XCTestCase {
         viewModel.documentNumber = "12345678"
 
         // Then the form becomes valid
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectFormValidTrue], timeout: 1.0)
     }
 
     func testInvalidatesWhenFieldRegresses() {
@@ -46,11 +51,11 @@ final class RegisterViewModelTests: XCTestCase {
         viewModel.documentNumber = "12345678"
 
         // And a subscriber expecting it to become invalid
-        let expectation = expectation(description: "form becomes invalid")
+        let expectFormBecomesInvalid = expectation(description: "form becomes invalid")
         viewModel.$isFormValid
             .dropFirst()
-            .sink { valid in
-                if !valid { expectation.fulfill() }
+            .sink { isValid in
+                if !isValid { expectFormBecomesInvalid.fulfill() }
             }
             .store(in: &cancellables)
 
@@ -58,7 +63,7 @@ final class RegisterViewModelTests: XCTestCase {
         viewModel.phone = "123"  // invalid phone
 
         // Then the form validity flips to false
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectFormBecomesInvalid], timeout: 1.0)
     }
 
     func testFieldStatesUpdateCorrectly() {

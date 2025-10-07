@@ -56,7 +56,7 @@ struct RegisterView: View {
                     autocap: .never
                 )
 
-                DocumentSectionView(vm: registerVM)
+                DocumentSectionView(viewModel: registerVM)
 
                 PrimaryButtonView(
                     title: "Sign Up → Planets",

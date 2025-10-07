@@ -6,23 +6,23 @@ import UIKit
 /// Small section holding Document type + number field.
 /// View-only concerns; uses UnderlinedField internally.
 struct DocumentSectionView: View {
-    @ObservedObject var vm: RegisterViewModel
+    @ObservedObject var viewModel: RegisterViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Picker("Document type", selection: $vm.documentType) {
+            Picker("Document type", selection: $viewModel.documentType) {
                 Text("ID").tag(DocumentType.id)
                 Text("Passport").tag(DocumentType.passport)
             }
             .pickerStyle(.segmented)
 
             UnderlinedFieldView(
-                title: vm.documentType == .id
+                title: viewModel.documentType == .id
                     ? "Document number (8 digits)" : "Passport",
-                text: $vm.documentNumber,
-                state: vm.documentNumberState,
+                text: $viewModel.documentNumber,
+                state: viewModel.documentNumberState,
                 contentType: nil,
-                keyboard: vm.documentType == .id ? .numberPad : .asciiCapable,
+                keyboard: viewModel.documentType == .id ? .numberPad : .asciiCapable,
                 autocap: .never
             )
         }

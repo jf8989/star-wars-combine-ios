@@ -3,7 +3,7 @@
 
 import XCTest
 
-@testable import StarWarsCombine
+@testable import StarWarsCombine2
 
 final class PlanetsPagerTests: XCTestCase {
 

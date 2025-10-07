@@ -6,11 +6,27 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		749FC7D32E8DBF20003A7612 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 74AC70992E60C5A100741F69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 74AC70A02E60C5A100741F69;
+			remoteInfo = StarWarsCombine;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		74AC70A12E60C5A100741F69 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsCombine.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		749FC7CF2E8DBF20003A7612 /* StarWarsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StarWarsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		74FCA9702E63AD8400165A40 /* StarWarsCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsCombine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		749FC7D02E8DBF20003A7612 /* StarWarsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = StarWarsTests;
+			sourceTree = "<group>";
+		};
 		74AC70A32E60C5A100741F69 /* StarWarsCombine */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = StarWarsCombine;
@@ -19,6 +35,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		749FC7CC2E8DBF20003A7612 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		74AC709E2E60C5A100741F69 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,21 +56,38 @@
 			isa = PBXGroup;
 			children = (
 				74AC70A32E60C5A100741F69 /* StarWarsCombine */,
-				74AC70A22E60C5A100741F69 /* Products */,
+				74FCA9702E63AD8400165A40 /* StarWarsCombine.app */,
+				749FC7CF2E8DBF20003A7612 /* StarWarsTests.xctest */,
+				749FC7D02E8DBF20003A7612 /* StarWarsTests */,
 			);
-			sourceTree = "<group>";
-		};
-		74AC70A22E60C5A100741F69 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				74AC70A12E60C5A100741F69 /* StarWarsCombine.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		749FC7CE2E8DBF20003A7612 /* StarWarsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 749FC7D52E8DBF20003A7612 /* Build configuration list for PBXNativeTarget "StarWarsTests" */;
+			buildPhases = (
+				749FC7CB2E8DBF20003A7612 /* Sources */,
+				749FC7CC2E8DBF20003A7612 /* Frameworks */,
+				749FC7CD2E8DBF20003A7612 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				749FC7D42E8DBF20003A7612 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				749FC7D02E8DBF20003A7612 /* StarWarsTests */,
+			);
+			name = StarWarsTests;
+			packageProductDependencies = (
+			);
+			productName = StarWarsTests;
+			productReference = 749FC7CF2E8DBF20003A7612 /* StarWarsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		74AC70A02E60C5A100741F69 /* StarWarsCombine */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 74AC70AC2E60C5A200741F69 /* Build configuration list for PBXNativeTarget "StarWarsCombine" */;
@@ -67,7 +107,7 @@
 			packageProductDependencies = (
 			);
 			productName = StarWarsCombine;
-			productReference = 74AC70A12E60C5A100741F69 /* StarWarsCombine.app */;
+			productReference = 74FCA9702E63AD8400165A40 /* StarWarsCombine.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -80,6 +120,10 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					749FC7CE2E8DBF20003A7612 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 74AC70A02E60C5A100741F69;
+					};
 					74AC70A02E60C5A100741F69 = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -95,16 +139,24 @@
 			mainGroup = 74AC70982E60C5A100741F69;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 74AC70A22E60C5A100741F69 /* Products */;
+			productRefGroup = 74AC70982E60C5A100741F69;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				74AC70A02E60C5A100741F69 /* StarWarsCombine */,
+				749FC7CE2E8DBF20003A7612 /* StarWarsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		749FC7CD2E8DBF20003A7612 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		74AC709F2E60C5A100741F69 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +167,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		749FC7CB2E8DBF20003A7612 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		74AC709D2E60C5A100741F69 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +183,51 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		749FC7D42E8DBF20003A7612 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 74AC70A02E60C5A100741F69 /* StarWarsCombine */;
+			targetProxy = 749FC7D32E8DBF20003A7612 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		749FC7D62E8DBF20003A7612 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L8264UZJKL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ravn-iOS-Nerdery.StarWarsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StarWarsCombine.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StarWarsCombine";
+			};
+			name = Debug;
+		};
+		749FC7D72E8DBF20003A7612 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L8264UZJKL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ravn-iOS-Nerdery.StarWarsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StarWarsCombine.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StarWarsCombine";
+			};
+			name = Release;
+		};
 		74AC70AA2E60C5A200741F69 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -305,6 +408,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		749FC7D52E8DBF20003A7612 /* Build configuration list for PBXNativeTarget "StarWarsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				749FC7D62E8DBF20003A7612 /* Debug */,
+				749FC7D72E8DBF20003A7612 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		74AC709C2E60C5A100741F69 /* Build configuration list for PBXProject "StarWarsCombine" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

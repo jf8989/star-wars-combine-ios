@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Endor",
+        "climate": "temperate",
+        "gravity": "0.85 standard",
+        "terrain": "forests, mountains, lakes",
+        "diameter": "4900",
+        "population": "30000000"
+    },
+    {
+        "name": "Hoth",
+        "climate": "frozen",
+        "gravity": "1.1 standard",
+        "terrain": "tundra, ice caves, mountain ranges",
+        "diameter": "7200",
+        "population": "unknown"
+    }
+]

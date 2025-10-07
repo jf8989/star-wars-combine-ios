@@ -1,0 +1,8 @@
+{
+    "name": "Tatooine",
+    "climate": "arid",
+    "gravity": "1 standard",
+    "terrain": "desert",
+    "diameter": "10465",
+    "population": "200000"
+}
